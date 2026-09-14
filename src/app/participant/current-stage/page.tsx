@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getStageDecisions, getTeamById } from "@/lib/simulation";
 import { saveSelectedDecisions } from "@/lib/team-store";
 
-export default function CurrentStagePage() {
+function CurrentStageContent() {
   const searchParams = useSearchParams();
   const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
@@ -142,5 +142,13 @@ export default function CurrentStagePage() {
         </div>
       ) : null}
     </main>
+  );
+}
+
+export default function CurrentStagePage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-slate-100" />}>
+      <CurrentStageContent />
+    </Suspense>
   );
 }
