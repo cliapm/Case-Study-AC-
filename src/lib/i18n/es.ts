@@ -43,4 +43,30 @@ export const es = {
     outcomeSummary: "Resumen del resultado", appliedDecisions: "Decisiones aplicadas", baselineOnly: "Solo línea base",
     summary: "El resultado final refleja la redacción de la garantía, la estructura de contraindemnización, el momento de la intervención, los controles de suscripción, la preparación de reclamos y la ejecución de recuperación. Estos factores determinan si el equipo limita el valor del reclamo, crea protección y realiza recuperaciones.",
   },
+  facilitatorLogin: {
+    label: "Acceso de facilitador", title: "Proyecto Agua Clara", subtitle: "Panel de control confidencial de la simulación",
+    passwordLabel: "Contraseña", passwordPlaceholder: "Ingresa la contraseña de facilitador",
+    incorrectPassword: "Contraseña de facilitador incorrecta.", enterButton: "Entrar al panel", backHome: "Volver al inicio",
+  },
+  facilitatorDashboard: {
+    label: "Control del facilitador", title: "Panel del Proyecto Agua Clara", refresh: "Actualizar",
+    finalStageReached: "Etapa final alcanzada", releasing: "Liberando...", releaseStage: "Liberar etapa",
+    comparisonScreen: "Pantalla de comparación", exportCsv: "Exportar CSV",
+    currentReleasedStage: "Etapa actual liberada", teamsSubmitted: "Equipos que enviaron", teamsWaiting: "Equipos en espera",
+    status: "Estado", live: "En vivo", of: "de", stage: "Etapa", viewingSubmissions: "Visualizando envíos de esta etapa",
+    loading: "Cargando…", colTeam: "Equipo", colVariant: "Variante", colStatus: "Estado", colSubmitted: "Enviado",
+    colDecisionCodes: "Códigos de decisión", colPremium: "Prima", colRecovery: "Recuperación", colNetLoss: "Pérdida neta",
+    submittedStatus: "Enviado", waitingStatus: "En espera",
+    confirmRelease: "¿Liberar la etapa {stage}? Todos los equipos podrán avanzar de inmediato.",
+  },
+  facilitatorQr: {
+    label: "Acceso QR", title: "Código QR de acceso de participante", downloadButton: "Descargar imagen QR",
+  },
+  facilitatorComparison: {
+    label: "Comparación del facilitador", title: "Pantalla de comparación de variantes", colTeam: "Equipo", colVariant: "Variante",
+    colBaselineNetLoss: "Pérdida neta base", colDecisionAdjustments: "Ajustes por decisiones", colFinalNetLoss: "Pérdida neta final",
+  },
+  facilitatorLoading: {
+    label: "Estado de la simulación", title: "Cargando panel del facilitador",
+  },
 };

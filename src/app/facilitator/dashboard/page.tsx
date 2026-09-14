@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Team } from "@/lib/types";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 type Position = {
   accumulatedPremium: number;
@@ -18,6 +19,7 @@ type TeamWithSubmission = Team & {
 };
 
 export default function FacilitatorDashboardPage() {
+  const { t } = useLanguage();
   const [teams, setTeams] = useState<TeamWithSubmission[]>([]);
   const [submittedCount, setSubmittedCount] = useState(0);
   const [stageNumber, setStageNumber] = useState(1);
@@ -50,7 +52,7 @@ export default function FacilitatorDashboardPage() {
   }, [stageNumber]);
 
   const handleReleaseStage = async () => {
-    if (!confirm(`Release Stage ${releasedStage + 1}? All teams will be able to move forward immediately.`)) return;
+    if (!confirm(t("facilitatorDashboard.confirmRelease").replace("{stage}", String(releasedStage + 1)))) return;
     setIsReleasing(true);
     try {
       const res = await fetch("/api/facilitator/release-stage", { method: "POST" });
@@ -71,29 +73,29 @@ export default function FacilitatorDashboardPage() {
       <div className="mx-auto max-w-7xl">
         <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">Facilitator control</p>
-            <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">Project Agua Clara Dashboard</h1>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">{t("facilitatorDashboard.label")}</p>
+            <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">{t("facilitatorDashboard.title")}</h1>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button onClick={fetchTeams} className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700">Refresh</button>
+            <button onClick={fetchTeams} className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700">{t("facilitatorDashboard.refresh")}</button>
             <button
               onClick={handleReleaseStage}
               disabled={isReleasing || releasedStage >= 5}
               className="rounded-xl bg-[#9e1b2b] px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              {releasedStage >= 5 ? "Final stage reached" : isReleasing ? "Releasing..." : `Release Stage ${releasedStage + 1}`}
+              {releasedStage >= 5 ? t("facilitatorDashboard.finalStageReached") : isReleasing ? t("facilitatorDashboard.releasing") : `${t("facilitatorDashboard.releaseStage")} ${releasedStage + 1}`}
             </button>
-            <Link href="/facilitator/comparison" className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700">Comparison screen</Link>
-            <a href="/api/facilitator/export-csv" className="rounded-xl bg-[#0d2d4f] px-4 py-2 font-semibold text-white">Export CSV</a>
+            <Link href="/facilitator/comparison" className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700">{t("facilitatorDashboard.comparisonScreen")}</Link>
+            <a href="/api/facilitator/export-csv" className="rounded-xl bg-[#0d2d4f] px-4 py-2 font-semibold text-white">{t("facilitatorDashboard.exportCsv")}</a>
           </div>
         </header>
 
         <section className="mb-6 grid gap-4 md:grid-cols-4">
           {[
-            { label: "Current released stage", value: String(releasedStage) },
-            { label: "Teams submitted", value: `${submittedCount} of ${totalTeams}` },
-            { label: "Teams waiting", value: String(totalTeams - submittedCount) },
-            { label: "Status", value: "Live" },
+            { label: t("facilitatorDashboard.currentReleasedStage"), value: String(releasedStage) },
+            { label: t("facilitatorDashboard.teamsSubmitted"), value: `${submittedCount} ${t("facilitatorDashboard.of")} ${totalTeams}` },
+            { label: t("facilitatorDashboard.teamsWaiting"), value: String(totalTeams - submittedCount) },
+            { label: t("facilitatorDashboard.status"), value: t("facilitatorDashboard.live") },
           ].map((item) => (
             <div key={item.label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">{item.label}</p>
@@ -109,28 +111,28 @@ export default function FacilitatorDashboardPage() {
               value={stageNumber}
               onChange={(e) => setStageNumber(Number(e.target.value))}
             >
-              <option value={1}>Stage 1</option>
-              <option value={2}>Stage 2</option>
-              <option value={3}>Stage 3</option>
-              <option value={4}>Stage 4</option>
-              <option value={5}>Stage 5</option>
+              <option value={1}>{t("facilitatorDashboard.stage")} 1</option>
+              <option value={2}>{t("facilitatorDashboard.stage")} 2</option>
+              <option value={3}>{t("facilitatorDashboard.stage")} 3</option>
+              <option value={4}>{t("facilitatorDashboard.stage")} 4</option>
+              <option value={5}>{t("facilitatorDashboard.stage")} 5</option>
             </select>
-            <span className="text-sm text-slate-500">Viewing submissions for this stage</span>
-            {isLoading ? <span className="text-sm text-slate-500">Loading…</span> : null}
+            <span className="text-sm text-slate-500">{t("facilitatorDashboard.viewingSubmissions")}</span>
+            {isLoading ? <span className="text-sm text-slate-500">{t("facilitatorDashboard.loading")}</span> : null}
           </div>
 
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
               <thead className="bg-slate-100 text-slate-700">
                 <tr>
-                  <th className="px-3 py-3 font-semibold">Team</th>
-                  <th className="px-3 py-3 font-semibold">Variant</th>
-                  <th className="px-3 py-3 font-semibold">Status</th>
-                  <th className="px-3 py-3 font-semibold">Submitted</th>
-                  <th className="px-3 py-3 font-semibold">Decision codes</th>
-                  <th className="px-3 py-3 font-semibold">Premium</th>
-                  <th className="px-3 py-3 font-semibold">Recovery</th>
-                  <th className="px-3 py-3 font-semibold">Net loss</th>
+                  <th className="px-3 py-3 font-semibold">{t("facilitatorDashboard.colTeam")}</th>
+                  <th className="px-3 py-3 font-semibold">{t("facilitatorDashboard.colVariant")}</th>
+                  <th className="px-3 py-3 font-semibold">{t("facilitatorDashboard.colStatus")}</th>
+                  <th className="px-3 py-3 font-semibold">{t("facilitatorDashboard.colSubmitted")}</th>
+                  <th className="px-3 py-3 font-semibold">{t("facilitatorDashboard.colDecisionCodes")}</th>
+                  <th className="px-3 py-3 font-semibold">{t("facilitatorDashboard.colPremium")}</th>
+                  <th className="px-3 py-3 font-semibold">{t("facilitatorDashboard.colRecovery")}</th>
+                  <th className="px-3 py-3 font-semibold">{t("facilitatorDashboard.colNetLoss")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -140,7 +142,7 @@ export default function FacilitatorDashboardPage() {
                     <td className="px-3 py-3">{team.variant}</td>
                     <td className="px-3 py-3">
                       <span className={`rounded-full px-2 py-1 text-xs font-medium ${team.status === "Submitted" ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"}`}>
-                        {team.status}
+                        {team.status === "Submitted" ? t("facilitatorDashboard.submittedStatus") : t("facilitatorDashboard.waitingStatus")}
                       </span>
                     </td>
                     <td className="px-3 py-3">{team.submission ? new Date(team.submission.submittedAt).toLocaleString() : "-"}</td>

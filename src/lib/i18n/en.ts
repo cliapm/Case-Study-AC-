@@ -43,4 +43,30 @@ export const en = {
     outcomeSummary: "Outcome summary", appliedDecisions: "Applied decisions", baselineOnly: "Baseline only",
     summary: "The final outcome reflects the bond wording, counter-indemnity structure, timing of intervention, underwriting controls, claims preparation and recovery enforcement. These factors determine whether the team limits claim value, creates protection, and realises recoveries.",
   },
+  facilitatorLogin: {
+    label: "Facilitator access", title: "Project Agua Clara", subtitle: "Confidential simulation control panel",
+    passwordLabel: "Password", passwordPlaceholder: "Enter facilitator password",
+    incorrectPassword: "Incorrect facilitator password.", enterButton: "Enter Dashboard", backHome: "Back to home",
+  },
+  facilitatorDashboard: {
+    label: "Facilitator control", title: "Project Agua Clara Dashboard", refresh: "Refresh",
+    finalStageReached: "Final stage reached", releasing: "Releasing...", releaseStage: "Release Stage",
+    comparisonScreen: "Comparison screen", exportCsv: "Export CSV",
+    currentReleasedStage: "Current released stage", teamsSubmitted: "Teams submitted", teamsWaiting: "Teams waiting",
+    status: "Status", live: "Live", of: "of", stage: "Stage", viewingSubmissions: "Viewing submissions for this stage",
+    loading: "Loading…", colTeam: "Team", colVariant: "Variant", colStatus: "Status", colSubmitted: "Submitted",
+    colDecisionCodes: "Decision codes", colPremium: "Premium", colRecovery: "Recovery", colNetLoss: "Net loss",
+    submittedStatus: "Submitted", waitingStatus: "Waiting",
+    confirmRelease: "Release Stage {stage}? All teams will be able to move forward immediately.",
+  },
+  facilitatorQr: {
+    label: "QR access", title: "Participant Login QR", downloadButton: "Download QR image",
+  },
+  facilitatorComparison: {
+    label: "Facilitator comparison", title: "Variant comparison screen", colTeam: "Team", colVariant: "Variant",
+    colBaselineNetLoss: "Baseline net loss", colDecisionAdjustments: "Decision adjustments", colFinalNetLoss: "Final net loss",
+  },
+  facilitatorLoading: {
+    label: "Simulation status", title: "Loading facilitator dashboard",
+  },
 };
