@@ -1,10 +1,11 @@
 import { MetricCard } from "@/components/MetricCard";
 import { calculateTeamPosition, getTeamById } from "@/lib/simulation";
 
-export default function FinalResultPage({ searchParams }: { searchParams?: { team?: string; codes?: string } }) {
-  const teamId = searchParams?.team ?? "A1";
+export default async function FinalResultPage({ searchParams }: { searchParams?: Promise<{ team?: string; codes?: string }> }) {
+  const params = await searchParams;
+  const teamId = params?.team ?? "A1";
   const team = getTeamById(teamId);
-  const selectedCodes = searchParams?.codes?.split(",").filter(Boolean) ?? [];
+  const selectedCodes = params?.codes?.split(",").filter(Boolean) ?? [];
   const result = calculateTeamPosition(teamId, 5, selectedCodes);
 
   return (
