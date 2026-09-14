@@ -39,3 +39,10 @@ export async function getAllSubmissionsForStage(stageNumber: number, teamIds: st
   });
   return map;
 }
+export async function getTeamSubmission(teamId: string, stageNumber: number) {
+  const redis = getRedisClient();
+  if (!redis) return null;
+  const raw = await redis.get<string>(submissionKey(teamId, stageNumber));
+  if (!raw) return null;
+  return typeof raw === "string" ? JSON.parse(raw) : raw;
+}
