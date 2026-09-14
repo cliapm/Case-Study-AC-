@@ -1,8 +1,9 @@
 import { teamList, variantLabels } from "@/lib/mock-data";
 import { getTeamById } from "@/lib/simulation";
 
-export default function CaseOverviewPage({ searchParams }: { searchParams?: { team?: string } }) {
-  const teamId = searchParams?.team ?? "A1";
+export default async function CaseOverviewPage({ searchParams }: { searchParams?: Promise<{ team?: string }> }) {
+  const params = await searchParams;
+  const teamId = params?.team ?? "A1";
   const team = getTeamById(teamId);
 
   return (
