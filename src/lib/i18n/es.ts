@@ -1,7 +1,7 @@
 export const es = {
   nav: { participant: "Participante", facilitator: "Facilitador", qr: "QR" },
   brand: { tag: "Proyecto Agua Clara", subtitle: "Simulación" },
-  common: { team: "Equipo", variant: "Variante", selected: "Seleccionada", unselected: "No seleccionada", stage: "Etapa" },
+  common: { team: "Equipo", variant: "Variante", selected: "Seleccionada", unselected: "No seleccionada", stage: "Etapa", back: "Volver" },
   simulation: {
     baselineNote: "Línea base de la variante {variant} vigente para el caso y la estructura legal actuales.",
     netLossNote: "Pérdida neta para la variante {variant} después de la etapa {stage}: USD {value} millones.",

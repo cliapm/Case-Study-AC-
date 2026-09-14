@@ -2,6 +2,7 @@
 
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { MetricCard } from "@/components/MetricCard";
 import { calculateTeamPosition, getTeamById } from "@/lib/simulation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -11,8 +12,9 @@ function CurrentPositionContent() {
   const searchParams = useSearchParams();
   const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
+  const stage = Number(searchParams.get("stage") ?? team.currentStage);
   const selectedCodes = searchParams.get("codes")?.split(",").filter(Boolean) ?? [];
-  const position = calculateTeamPosition(teamId, team.currentStage, selectedCodes, language);
+  const position = calculateTeamPosition(teamId, stage, selectedCodes, language);
 
   const metrics = [
     { label: t("currentPosition.apExposure"), value: `${position.apExposure.toFixed(1)}m` },
@@ -31,6 +33,7 @@ function CurrentPositionContent() {
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-6 text-slate-900">
       <div className="mx-auto max-w-6xl">
+        <Link href={`/participant/waiting?team=${team.id}&stage=${stage}`} className="mb-4 inline-flex items-center text-sm font-medium text-[#0d2d4f] underline">← {t("common.back")}</Link>
         <header className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">{t("currentPosition.label")}</p>
           <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">{t("common.team")} {team.id} • {t("common.variant")} {team.variant}</h1>

@@ -1,7 +1,7 @@
 export const en = {
   nav: { participant: "Participant", facilitator: "Facilitator", qr: "QR" },
   brand: { tag: "Project Agua Clara", subtitle: "Simulation" },
-  common: { team: "Team", variant: "Variant", selected: "Selected", unselected: "Unselected", stage: "Stage" },
+  common: { team: "Team", variant: "Variant", selected: "Selected", unselected: "Unselected", stage: "Stage", back: "Back" },
   simulation: {
     baselineNote: "{variant} baseline in place for the current case and legal structure.",
     netLossNote: "Net loss for {variant} after stage {stage}: USD {value} million.",

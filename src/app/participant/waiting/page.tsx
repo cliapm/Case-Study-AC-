@@ -94,9 +94,9 @@ function WaitingContent() {
 
         <div className="mt-6 flex flex-wrap gap-3">
           {isFinalStage && stored ? (
-            <Link href={`/participant/final-result?team=${team.id}&codes=${stored.selectedDecisionCodes.join(",")}`} className="inline-flex rounded-xl bg-[#0d2d4f] px-4 py-3 font-semibold text-white">{t("waiting.viewFinalResult")}</Link>
+            <Link href={`/participant/final-result?team=${team.id}&stage=${submittedStage}&codes=${stored.selectedDecisionCodes.join(",")}`} className="inline-flex rounded-xl bg-[#0d2d4f] px-4 py-3 font-semibold text-white">{t("waiting.viewFinalResult")}</Link>
           ) : stored ? (
-            <Link href={`/participant/current-position?team=${team.id}&codes=${stored.selectedDecisionCodes.join(",")}`} className="inline-flex rounded-xl bg-[#0d2d4f] px-4 py-3 font-semibold text-white">{t("waiting.viewPosition")}</Link>
+            <Link href={`/participant/current-position?team=${team.id}&stage=${submittedStage}&codes=${stored.selectedDecisionCodes.join(",")}`} className="inline-flex rounded-xl bg-[#0d2d4f] px-4 py-3 font-semibold text-white">{t("waiting.viewPosition")}</Link>
           ) : null}
           {nextStageAvailable ? (
             <Link href={`/participant/current-stage?team=${team.id}`} className="inline-flex rounded-xl bg-[#9e1b2b] px-4 py-3 font-semibold text-white">{t("waiting.continueToStage")} {releasedStage}</Link>
