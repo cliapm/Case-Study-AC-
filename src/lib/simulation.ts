@@ -1,6 +1,13 @@
 import { decisionCatalog, teamList, variantBaselines } from "@/lib/mock-data";
 import { getRuleForDecision } from "@/lib/rules";
 import { Team, TeamPosition, Variant } from "@/lib/types";
+import { getLocalizedRuleExplanation } from "@/lib/i18n/content";
+import { en } from "@/lib/i18n/en";
+import { es } from "@/lib/i18n/es";
+import { pt } from "@/lib/i18n/pt";
+import type { Language } from "@/lib/i18n/LanguageContext";
+
+const simulationText: Record<Language, typeof en.simulation> = { en: en.simulation, es: es.simulation, pt: pt.simulation };
 
 export type PositionSnapshot = {
   teamId: string;
@@ -34,9 +41,10 @@ export function getVariantTeamSummary(variant: Variant) {
   return teamList.filter((team) => team.variant === variant);
 }
 
-export function calculateTeamPosition(teamId: string, stageNumber: number, selectedCodes: string[]): TeamPosition {
+export function calculateTeamPosition(teamId: string, stageNumber: number, selectedCodes: string[], language: Language = "en"): TeamPosition {
   const team = getTeamById(teamId);
   const baseline = variantBaselines[team.variant];
+  const text = simulationText[language];
 
   const base: PositionSnapshot = {
     teamId,
@@ -52,7 +60,7 @@ export function calculateTeamPosition(teamId: string, stageNumber: number, selec
     reserve: 0,
     netLoss: baseline.netLoss,
     knownEffects: [
-      `${team.variant} baseline in place for the current case and legal structure.`,
+      text.baselineNote.replace("{variant}", team.variant),
     ],
   };
 
@@ -86,14 +94,14 @@ export function calculateTeamPosition(teamId: string, stageNumber: number, selec
       if (rule.targetMetric === "securedProtections") {
         updated.reserve += rule.adjustmentValue;
       }
-      effects.push(`${decision.code}: ${rule.confidentialExplanation}`);
+      effects.push(`${decision.code}: ${getLocalizedRuleExplanation(decision.code, language)}`);
     });
   });
 
   updated.netLoss = Number((updated.apPaid + updated.pbPaid + updated.costs - updated.potentialRecovery - updated.accumulatedPremium).toFixed(3));
   updated.knownEffects = [
     ...effects.slice(0, 4),
-    `Net loss for ${team.variant} after stage ${stageNumber}: USD ${updated.netLoss.toFixed(3)} million.`,
+    text.netLossNote.replace("{variant}", team.variant).replace("{stage}", String(stageNumber)).replace("{value}", updated.netLoss.toFixed(3)),
   ];
 
   const result: TeamPosition = {

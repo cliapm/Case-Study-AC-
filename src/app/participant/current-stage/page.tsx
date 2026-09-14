@@ -6,9 +6,10 @@ import { getStageDecisions, getTeamById } from "@/lib/simulation";
 import { stages } from "@/lib/mock-data";
 import { saveSelectedDecisions } from "@/lib/team-store";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { getLocalizedDecision, getLocalizedStage } from "@/lib/i18n/content";
 
 function CurrentStageContent() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const searchParams = useSearchParams();
   const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
@@ -47,6 +48,7 @@ function CurrentStageContent() {
 
   const decisions = useMemo(() => (stageNumber ? getStageDecisions(stageNumber) : []), [stageNumber]);
   const stageInfo = useMemo(() => stages.find((s) => s.number === stageNumber), [stageNumber]);
+  const localizedStageInfo = useMemo(() => (stageNumber ? getLocalizedStage(stageNumber, language) : undefined), [stageNumber, language]);
 
   const selectedDetails = useMemo(
     () => decisions.filter((decision) => selectedCodes.includes(decision.code)),
@@ -95,7 +97,7 @@ function CurrentStageContent() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">{t("currentStage.label")}</p>
-              <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">Stage {stageNumber}: {stageInfo?.title}</h1>
+              <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">{t("common.stage")} {stageNumber}: {localizedStageInfo?.title}</h1>
             </div>
             <div className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700">{t("currentStage.openBadge")}</div>
           </div>
@@ -105,7 +107,7 @@ function CurrentStageContent() {
           <div className="mb-5 flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">{t("currentStage.team")}</p>
-              <h2 className="mt-2 text-2xl font-bold text-[#0d2d4f]">{team.id} • Variant {team.variant}</h2>
+              <h2 className="mt-2 text-2xl font-bold text-[#0d2d4f]">{team.id} • {t("common.variant")} {team.variant}</h2>
             </div>
             <div className="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700">{selectedCodes.length} {t("currentStage.selectedCount")}</div>
           </div>
@@ -113,13 +115,14 @@ function CurrentStageContent() {
           {stageInfo ? (
             <div className="mb-5 rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
               <p className="font-medium text-slate-900">{t("currentStage.caseDevelopment")}</p>
-              <p className="mt-2">{stageInfo.caseDevelopment}</p>
+              <p className="mt-2">{localizedStageInfo?.caseDevelopment}</p>
             </div>
           ) : null}
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {decisions.map((decision) => {
               const isSelected = selectedCodes.includes(decision.code);
+              const localizedDecision = getLocalizedDecision(decision.code, language);
               return (
                 <button
                   key={decision.code}
@@ -131,10 +134,10 @@ function CurrentStageContent() {
                 >
                   <div className="mb-3 flex items-center justify-between">
                     <span className="rounded-full bg-[#0d2d4f] px-2 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-white">{decision.code}</span>
-                    <span className="text-xs font-medium text-slate-500">{isSelected ? "Selected" : "Unselected"}</span>
+                    <span className="text-xs font-medium text-slate-500">{isSelected ? t("common.selected") : t("common.unselected")}</span>
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900">{decision.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-slate-700">{decision.text}</p>
+                  <h3 className="text-lg font-bold text-slate-900">{localizedDecision?.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-700">{localizedDecision?.text}</p>
                 </button>
               );
             })}
@@ -162,7 +165,7 @@ function CurrentStageContent() {
             <p className="mt-3 text-sm leading-6 text-slate-700">{t("currentStage.finalWarning")}</p>
             <ul className="mt-4 space-y-2 rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
               {selectedDetails.map((decision) => (
-                <li key={decision.code}><span className="font-semibold text-[#0d2d4f]">{decision.code}</span> — {decision.title}</li>
+                <li key={decision.code}><span className="font-semibold text-[#0d2d4f]">{decision.code}</span> — {getLocalizedDecision(decision.code, language)?.title}</li>
               ))}
             </ul>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">

@@ -7,19 +7,19 @@ import { calculateTeamPosition, getTeamById } from "@/lib/simulation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function FinalResultContent() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const searchParams = useSearchParams();
   const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
   const selectedCodes = searchParams.get("codes")?.split(",").filter(Boolean) ?? [];
-  const result = calculateTeamPosition(teamId, 5, selectedCodes);
+  const result = calculateTeamPosition(teamId, 5, selectedCodes, language);
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-6 text-slate-900">
       <div className="mx-auto max-w-6xl space-y-6">
         <header className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">{t("finalResult.label")}</p>
-          <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">Team {team.id} • Variant {team.variant}</h1>
+          <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">{t("common.team")} {team.id} • {t("common.variant")} {team.variant}</h1>
         </header>
 
         <section className="grid gap-4 md:grid-cols-3">

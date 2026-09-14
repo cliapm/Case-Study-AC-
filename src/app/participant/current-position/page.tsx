@@ -7,12 +7,12 @@ import { calculateTeamPosition, getTeamById } from "@/lib/simulation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function CurrentPositionContent() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const searchParams = useSearchParams();
   const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
   const selectedCodes = searchParams.get("codes")?.split(",").filter(Boolean) ?? [];
-  const position = calculateTeamPosition(teamId, team.currentStage, selectedCodes);
+  const position = calculateTeamPosition(teamId, team.currentStage, selectedCodes, language);
 
   const metrics = [
     { label: t("currentPosition.apExposure"), value: `${position.apExposure.toFixed(3)}m` },
@@ -33,7 +33,7 @@ function CurrentPositionContent() {
       <div className="mx-auto max-w-6xl">
         <header className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">{t("currentPosition.label")}</p>
-          <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">Team {team.id} • Variant {team.variant}</h1>
+          <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">{t("common.team")} {team.id} • {t("common.variant")} {team.variant}</h1>
         </header>
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

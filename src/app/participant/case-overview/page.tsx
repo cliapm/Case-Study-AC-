@@ -1,13 +1,13 @@
 "use client";
 
-import { teamList, variantLabels } from "@/lib/mock-data";
 import { getTeamById } from "@/lib/simulation";
+import { getLocalizedVariantLabel } from "@/lib/i18n/content";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 function CaseOverviewContent() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const searchParams = useSearchParams();
   const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
@@ -21,7 +21,7 @@ function CaseOverviewContent() {
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">{t("caseOverview.title")}</p>
               <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">{t("caseOverview.heading")}</h1>
             </div>
-            <div className="rounded-full bg-[#0d2d4f] px-4 py-2 text-sm font-semibold text-white">Team {team.id} • Variant {team.variant}</div>
+            <div className="rounded-full bg-[#0d2d4f] px-4 py-2 text-sm font-semibold text-white">{t("common.team")} {team.id} • {t("common.variant")} {team.variant}</div>
           </div>
         </header>
 
@@ -42,8 +42,8 @@ function CaseOverviewContent() {
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-2xl font-bold text-[#0d2d4f]">{t("caseOverview.assignedVariant")}</h2>
             <div className="mt-5 rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-              <p className="font-semibold text-slate-900">Variant {team.variant}</p>
-              <p className="mt-2">{variantLabels[team.variant]}</p>
+              <p className="font-semibold text-slate-900">{t("common.variant")} {team.variant}</p>
+              <p className="mt-2">{getLocalizedVariantLabel(team.variant, language)}</p>
             </div>
           </div>
         </section>

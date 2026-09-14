@@ -62,7 +62,7 @@ function WaitingContent() {
           </div>
           <div className="rounded-2xl bg-slate-50 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">{t("waiting.progress")}</p>
-            <p className="mt-2 text-xl font-bold text-[#0d2d4f]">Stage {submittedStage} {t("waiting.stageSubmitted")}</p>
+            <p className="mt-2 text-xl font-bold text-[#0d2d4f]">{t("common.stage")} {submittedStage} {t("waiting.stageSubmitted")}</p>
           </div>
         </div>
 
@@ -73,7 +73,7 @@ function WaitingContent() {
 
         {nextStageAvailable ? (
           <div className="mt-6 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-800">
-            <p className="font-medium">Stage {releasedStage} {t("waiting.nowOpen")}</p>
+            <p className="font-medium">{t("common.stage")} {releasedStage} {t("waiting.nowOpen")}</p>
             <p className="mt-2">{t("waiting.continueNext")}</p>
           </div>
         ) : (
