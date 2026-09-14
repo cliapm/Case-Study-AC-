@@ -1,8 +1,9 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getStageDecisions, getTeamById } from "@/lib/simulation";
+import { stages } from "@/lib/mock-data";
 import { saveSelectedDecisions } from "@/lib/team-store";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
@@ -11,10 +12,41 @@ function CurrentStageContent() {
   const searchParams = useSearchParams();
   const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
-  const decisions = getStageDecisions(team.currentStage);
+
+  const [stageNumber, setStageNumber] = useState<number | null>(null);
+  const [isChecking, setIsChecking] = useState(true);
   const [selectedCodes, setSelectedCodes] = useState<string[]>([]);
   const [showConfirm, setShowConfirm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function check() {
+      const stageRes = await fetch("/api/stage");
+      const stageData = await stageRes.json();
+      const currentStage = stageData.stageNumber ?? 1;
+
+      const subRes = await fetch(`/api/submission?team=${teamId}&stage=${currentStage}`);
+      const subData = await subRes.json();
+
+      if (cancelled) return;
+
+      if (subData.submission) {
+        window.location.href = `/participant/waiting?team=${teamId}&stage=${currentStage}`;
+        return;
+      }
+
+      setStageNumber(currentStage);
+      setIsChecking(false);
+    }
+    check();
+    return () => {
+      cancelled = true;
+    };
+  }, [teamId]);
+
+  const decisions = useMemo(() => (stageNumber ? getStageDecisions(stageNumber) : []), [stageNumber]);
+  const stageInfo = useMemo(() => stages.find((s) => s.number === stageNumber), [stageNumber]);
 
   const selectedDetails = useMemo(
     () => decisions.filter((decision) => selectedCodes.includes(decision.code)),
@@ -32,6 +64,7 @@ function CurrentStageContent() {
   const canSubmit = selectedCodes.length === 3;
 
   const handleConfirmSubmission = async () => {
+    if (!stageNumber) return;
     setIsSubmitting(true);
     try {
       await fetch("/api/submit-decision", {
@@ -39,17 +72,21 @@ function CurrentStageContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           teamId: team.id,
-          stageNumber: team.currentStage,
+          stageNumber,
           selectedDecisionCodes: selectedCodes,
         }),
       });
-      saveSelectedDecisions(team.id, team.currentStage, selectedCodes);
-      window.location.href = `/participant/waiting?team=${team.id}`;
+      saveSelectedDecisions(team.id, stageNumber, selectedCodes);
+      window.location.href = `/participant/waiting?team=${team.id}&stage=${stageNumber}`;
     } catch (err) {
       console.error(err);
       setIsSubmitting(false);
     }
   };
+
+  if (isChecking || !stageNumber) {
+    return <main className="min-h-screen bg-slate-100 px-4 py-6 text-slate-900">{t("currentStage.loading")}</main>;
+  }
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-6 text-slate-900">
@@ -58,7 +95,7 @@ function CurrentStageContent() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">{t("currentStage.label")}</p>
-              <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">Stage {team.currentStage}</h1>
+              <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">Stage {stageNumber}: {stageInfo?.title}</h1>
             </div>
             <div className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700">{t("currentStage.openBadge")}</div>
           </div>
@@ -73,10 +110,12 @@ function CurrentStageContent() {
             <div className="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700">{selectedCodes.length} {t("currentStage.selectedCount")}</div>
           </div>
 
-          <div className="mb-5 rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-            <p className="font-medium text-slate-900">{t("currentStage.caseDevelopment")}</p>
-            <p className="mt-2">The project begins with mobilisation and initial underwriting controls. The team must decide how to structure the AP bond and project account risk protections.</p>
-          </div>
+          {stageInfo ? (
+            <div className="mb-5 rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
+              <p className="font-medium text-slate-900">{t("currentStage.caseDevelopment")}</p>
+              <p className="mt-2">{stageInfo.caseDevelopment}</p>
+            </div>
+          ) : null}
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {decisions.map((decision) => {
