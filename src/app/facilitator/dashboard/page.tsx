@@ -1,8 +1,44 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { teamList, variantBaselines } from "@/lib/mock-data";
+import { variantBaselines } from "@/lib/mock-data";
+import type { Team } from "@/lib/types";
+
+type TeamWithSubmission = Team & {
+  submission: {
+    selectedDecisionCodes: string[];
+    submittedAt: string;
+  } | null;
+  status: "Submitted" | "Waiting";
+};
 
 export default function FacilitatorDashboardPage() {
-  const teams = teamList;
+  const [teams, setTeams] = useState<TeamWithSubmission[]>([]);
+  const [submittedCount, setSubmittedCount] = useState(0);
+  const [stageNumber, setStageNumber] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchTeams = async () => {
+    try {
+      const res = await fetch(`/api/facilitator/teams?stage=${stageNumber}`);
+      const data = await res.json();
+      setTeams(data.teams ?? []);
+      setSubmittedCount(data.submittedCount ?? 0);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTeams();
+    const interval = setInterval(fetchTeams, 3000);
+    return () => clearInterval(interval);
+  }, [stageNumber]);
+
+  const totalTeams = teams.length || 28;
 
   return (
     <main className="min-h-screen bg-slate-100 p-4 text-slate-900 lg:p-6">
@@ -13,7 +49,7 @@ export default function FacilitatorDashboardPage() {
             <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">Project Agua Clara Dashboard</h1>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700">Refresh</button>
+            <button onClick={fetchTeams} className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700">Refresh</button>
             <button className="rounded-xl bg-[#9e1b2b] px-4 py-2 font-semibold text-white">Release Stage</button>
             <Link href="/facilitator/comparison" className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700">Comparison screen</Link>
             <a href="/api/facilitator/export-csv" className="rounded-xl bg-[#0d2d4f] px-4 py-2 font-semibold text-white">Export CSV</a>
@@ -22,9 +58,9 @@ export default function FacilitatorDashboardPage() {
 
         <section className="mb-6 grid gap-4 md:grid-cols-4">
           {[
-            { label: "Current released stage", value: "4" },
-            { label: "Teams submitted", value: "27 of 28" },
-            { label: "Teams waiting", value: "1" },
+            { label: "Current released stage", value: String(stageNumber) },
+            { label: "Teams submitted", value: `${submittedCount} of ${totalTeams}` },
+            { label: "Teams waiting", value: String(totalTeams - submittedCount) },
             { label: "Status", value: "Live" },
           ].map((item) => (
             <div key={item.label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -35,27 +71,19 @@ export default function FacilitatorDashboardPage() {
         </section>
 
         <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="mb-4 flex flex-wrap gap-3">
-            <select className="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-              <option>All variants</option>
-              <option>A</option>
-              <option>B</option>
-              <option>C</option>
-              <option>D</option>
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <select
+              className="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+              value={stageNumber}
+              onChange={(e) => setStageNumber(Number(e.target.value))}
+            >
+              <option value={1}>Stage 1</option>
+              <option value={2}>Stage 2</option>
+              <option value={3}>Stage 3</option>
+              <option value={4}>Stage 4</option>
+              <option value={5}>Stage 5</option>
             </select>
-            <select className="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-              <option>All stages</option>
-              <option>Stage 1</option>
-              <option>Stage 2</option>
-              <option>Stage 3</option>
-              <option>Stage 4</option>
-              <option>Stage 5</option>
-            </select>
-            <select className="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-              <option>Submitted</option>
-              <option>Waiting</option>
-            </select>
-            <input className="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700" placeholder="Search team ID" />
+            {isLoading ? <span className="text-sm text-slate-500">Loading…</span> : null}
           </div>
 
           <div className="overflow-x-auto">
@@ -64,13 +92,11 @@ export default function FacilitatorDashboardPage() {
                 <tr>
                   <th className="px-3 py-3 font-semibold">Team</th>
                   <th className="px-3 py-3 font-semibold">Variant</th>
-                  <th className="px-3 py-3 font-semibold">Stage</th>
                   <th className="px-3 py-3 font-semibold">Status</th>
                   <th className="px-3 py-3 font-semibold">Submitted</th>
                   <th className="px-3 py-3 font-semibold">Decision codes</th>
                   <th className="px-3 py-3 font-semibold">Premium</th>
                   <th className="px-3 py-3 font-semibold">Recovery</th>
-                  <th className="px-3 py-3 font-semibold">Reserve</th>
                   <th className="px-3 py-3 font-semibold">Net loss</th>
                 </tr>
               </thead>
@@ -79,13 +105,23 @@ export default function FacilitatorDashboardPage() {
                   <tr key={team.id} className="border-t border-slate-200">
                     <td className="px-3 py-3 font-semibold text-[#0d2d4f]">{team.id}</td>
                     <td className="px-3 py-3">{team.variant}</td>
-                    <td className="px-3 py-3">{team.currentStage}</td>
-                    <td className="px-3 py-3"><span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700">Submitted</span></td>
-                    <td className="px-3 py-3">{new Date(team.createdAt).toLocaleString()}</td>
-                    <td className="px-3 py-3">U1, U2, U3</td>
+                    <td className="px-3 py-3">
+                      <span
+                        className={`rounded-full px-2 py-1 text-xs font-medium ${
+                          team.status === "Submitted" ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"
+                        }`}
+                      >
+                        {team.status}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3">
+                      {team.submission ? new Date(team.submission.submittedAt).toLocaleString() : "-"}
+                    </td>
+                    <td className="px-3 py-3">
+                      {team.submission ? team.submission.selectedDecisionCodes.join(", ") : "-"}
+                    </td>
                     <td className="px-3 py-3">{variantBaselines[team.variant].accumulatedPremium.toFixed(3)}m</td>
                     <td className="px-3 py-3">{variantBaselines[team.variant].recovery.toFixed(3)}m</td>
-                    <td className="px-3 py-3">0.000m</td>
                     <td className="px-3 py-3">{variantBaselines[team.variant].netLoss.toFixed(3)}m</td>
                   </tr>
                 ))}
