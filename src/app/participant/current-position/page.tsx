@@ -1,32 +1,38 @@
+"use client";
+
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { MetricCard } from "@/components/MetricCard";
 import { calculateTeamPosition, getTeamById } from "@/lib/simulation";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-export default async function CurrentPositionPage({ searchParams }: { searchParams?: Promise<{ team?: string; codes?: string }> }) {
-  const params = await searchParams;
-  const teamId = params?.team ?? "A1";
+function CurrentPositionContent() {
+  const { t } = useLanguage();
+  const searchParams = useSearchParams();
+  const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
-  const selectedCodes = params?.codes?.split(",").filter(Boolean) ?? [];
+  const selectedCodes = searchParams.get("codes")?.split(",").filter(Boolean) ?? [];
   const position = calculateTeamPosition(teamId, team.currentStage, selectedCodes);
 
   const metrics = [
-    { label: "Advance Payment Bond exposure", value: `${position.apExposure.toFixed(3)}m` },
-    { label: "Performance Bond exposure", value: `${position.pbExposure.toFixed(3)}m` },
-    { label: "Accumulated premium", value: `${position.accumulatedPremium.toFixed(3)}m` },
-    { label: "AP payment", value: `${position.apPaid.toFixed(3)}m` },
-    { label: "PB payment", value: `${position.pbPaid.toFixed(3)}m` },
-    { label: "Costs", value: `${position.costs.toFixed(3)}m` },
-    { label: "Secured protections", value: `${position.reserve.toFixed(3)}m` },
-    { label: "Potential recoveries", value: `${position.potentialRecovery.toFixed(3)}m` },
-    { label: "Realised recoveries", value: `${position.realisedRecovery.toFixed(3)}m` },
-    { label: "Current reserve", value: `${Math.max(position.netLoss, 0).toFixed(3)}m` },
-    { label: "Estimated net loss", value: `${position.netLoss.toFixed(3)}m` },
+    { label: t("currentPosition.apExposure"), value: `${position.apExposure.toFixed(3)}m` },
+    { label: t("currentPosition.pbExposure"), value: `${position.pbExposure.toFixed(3)}m` },
+    { label: t("currentPosition.accumulatedPremium"), value: `${position.accumulatedPremium.toFixed(3)}m` },
+    { label: t("currentPosition.apPayment"), value: `${position.apPaid.toFixed(3)}m` },
+    { label: t("currentPosition.pbPayment"), value: `${position.pbPaid.toFixed(3)}m` },
+    { label: t("currentPosition.costs"), value: `${position.costs.toFixed(3)}m` },
+    { label: t("currentPosition.securedProtections"), value: `${position.reserve.toFixed(3)}m` },
+    { label: t("currentPosition.potentialRecoveries"), value: `${position.potentialRecovery.toFixed(3)}m` },
+    { label: t("currentPosition.realisedRecoveries"), value: `${position.realisedRecovery.toFixed(3)}m` },
+    { label: t("currentPosition.currentReserve"), value: `${Math.max(position.netLoss, 0).toFixed(3)}m` },
+    { label: t("currentPosition.estimatedNetLoss"), value: `${position.netLoss.toFixed(3)}m` },
   ];
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-6 text-slate-900">
       <div className="mx-auto max-w-6xl">
         <header className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">Current position</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">{t("currentPosition.label")}</p>
           <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">Team {team.id} • Variant {team.variant}</h1>
         </header>
 
@@ -37,15 +43,23 @@ export default async function CurrentPositionPage({ searchParams }: { searchPara
         </section>
 
         <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-2xl font-bold text-[#0d2d4f]">Impact of Your Decisions</h2>
+          <h2 className="text-2xl font-bold text-[#0d2d4f]">{t("currentPosition.impactTitle")}</h2>
           <div className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
-            <p className="font-medium text-slate-900">Applied decisions: {selectedCodes.length ? selectedCodes.join(", ") : "Baseline only"}</p>
+            <p className="font-medium text-slate-900">{t("currentPosition.appliedDecisions")}: {selectedCodes.length ? selectedCodes.join(", ") : t("currentPosition.baselineOnly")}</p>
             {position.knownEffects.map((effect) => <p key={effect}>{effect}</p>)}
-            <p>The underwriting approach affects the amount of premium charged, the value of the contractual protections, and the recoverability of losses after claims arise.</p>
-            <p>Bond wording, counter-indemnity structure, timing of intervention, controls and coordinated recovery all influence the final result.</p>
+            <p>{t("currentPosition.para1")}</p>
+            <p>{t("currentPosition.para2")}</p>
           </div>
         </section>
       </div>
     </main>
+  );
+}
+
+export default function CurrentPositionPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-slate-100" />}>
+      <CurrentPositionContent />
+    </Suspense>
   );
 }
