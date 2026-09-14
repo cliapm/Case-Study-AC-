@@ -1,9 +1,15 @@
+"use client";
+
 import { teamList, variantLabels } from "@/lib/mock-data";
 import { getTeamById } from "@/lib/simulation";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default async function CaseOverviewPage({ searchParams }: { searchParams?: Promise<{ team?: string }> }) {
-  const params = await searchParams;
-  const teamId = params?.team ?? "A1";
+function CaseOverviewContent() {
+  const { t } = useLanguage();
+  const searchParams = useSearchParams();
+  const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
 
   return (
@@ -12,8 +18,8 @@ export default async function CaseOverviewPage({ searchParams }: { searchParams?
         <header className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">Case overview</p>
-              <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">Project Agua Clara</h1>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">{t("caseOverview.title")}</p>
+              <h1 className="mt-2 text-3xl font-bold text-[#0d2d4f]">{t("caseOverview.heading")}</h1>
             </div>
             <div className="rounded-full bg-[#0d2d4f] px-4 py-2 text-sm font-semibold text-white">Team {team.id} • Variant {team.variant}</div>
           </div>
@@ -21,20 +27,20 @@ export default async function CaseOverviewPage({ searchParams }: { searchParams?
 
         <section className="grid gap-6 lg:grid-cols-2">
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-2xl font-bold text-[#0d2d4f]">Project profile</h2>
+            <h2 className="text-2xl font-bold text-[#0d2d4f]">{t("caseOverview.projectProfile")}</h2>
             <ul className="mt-5 space-y-3 text-sm text-slate-700">
-              <li><strong className="text-slate-900">Project:</strong> Desalination plant in Peru</li>
-              <li><strong className="text-slate-900">Contract:</strong> Public EPC contract</li>
-              <li><strong className="text-slate-900">Original contract value:</strong> USD 600 million</li>
-              <li><strong className="text-slate-900">Original term:</strong> 48 months</li>
-              <li><strong className="text-slate-900">Assisted operation period:</strong> 24 months</li>
-              <li><strong className="text-slate-900">Advance Payment Bond:</strong> USD 120 million</li>
-              <li><strong className="text-slate-900">Performance Bond:</strong> USD 60 million</li>
+              <li><strong className="text-slate-900">{t("caseOverview.project")}:</strong> Desalination plant in Peru</li>
+              <li><strong className="text-slate-900">{t("caseOverview.contract")}:</strong> Public EPC contract</li>
+              <li><strong className="text-slate-900">{t("caseOverview.contractValue")}:</strong> USD 600 million</li>
+              <li><strong className="text-slate-900">{t("caseOverview.originalTerm")}:</strong> 48 months</li>
+              <li><strong className="text-slate-900">{t("caseOverview.assistedOperation")}:</strong> 24 months</li>
+              <li><strong className="text-slate-900">{t("caseOverview.apBond")}:</strong> USD 120 million</li>
+              <li><strong className="text-slate-900">{t("caseOverview.pbBond")}:</strong> USD 60 million</li>
             </ul>
           </div>
 
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-2xl font-bold text-[#0d2d4f]">Assigned variant</h2>
+            <h2 className="text-2xl font-bold text-[#0d2d4f]">{t("caseOverview.assignedVariant")}</h2>
             <div className="mt-5 rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
               <p className="font-semibold text-slate-900">Variant {team.variant}</p>
               <p className="mt-2">{variantLabels[team.variant]}</p>
@@ -43,7 +49,7 @@ export default async function CaseOverviewPage({ searchParams }: { searchParams?
         </section>
 
         <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-2xl font-bold text-[#0d2d4f]">Joint venture structure</h2>
+          <h2 className="text-2xl font-bold text-[#0d2d4f]">{t("caseOverview.jvStructure")}</h2>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
             {[
               { name: "Andina Infraestructura S.A.C.", share: "35%" },
@@ -59,9 +65,17 @@ export default async function CaseOverviewPage({ searchParams }: { searchParams?
         </section>
 
         <div className="flex justify-end">
-          <a href={`/participant/current-stage?team=${team.id}`} className="rounded-xl bg-[#9e1b2b] px-5 py-3 font-semibold text-white hover:bg-[#7d1524]">Proceed to current stage</a>
+          <a href={`/participant/current-stage?team=${team.id}`} className="rounded-xl bg-[#9e1b2b] px-5 py-3 font-semibold text-white hover:bg-[#7d1524]">{t("caseOverview.proceedButton")}</a>
         </div>
       </div>
     </main>
+  );
+}
+
+export default function CaseOverviewPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-slate-100" />}>
+      <CaseOverviewContent />
+    </Suspense>
   );
 }
