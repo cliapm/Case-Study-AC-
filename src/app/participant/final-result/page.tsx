@@ -24,12 +24,12 @@ function FinalResultContent() {
 
         <section className="grid gap-4 md:grid-cols-3">
           {[
-            { label: t("finalResult.finalAP"), value: `${result.apPaid.toFixed(3)}m` },
-            { label: t("finalResult.finalPB"), value: `${result.pbPaid.toFixed(3)}m` },
-            { label: t("finalResult.totalCosts"), value: `${result.costs.toFixed(3)}m` },
-            { label: t("finalResult.accumulatedPremium"), value: `${result.accumulatedPremium.toFixed(3)}m` },
-            { label: t("finalResult.totalRecovery"), value: `${(result.potentialRecovery + result.realisedRecovery).toFixed(3)}m` },
-            { label: t("finalResult.finalNetLoss"), value: `${result.netLoss.toFixed(3)}m` },
+            { label: t("finalResult.finalAP"), value: `${result.apPaid.toFixed(1)}m` },
+            { label: t("finalResult.finalPB"), value: `${result.pbPaid.toFixed(1)}m` },
+            { label: t("finalResult.totalCosts"), value: `${result.costs.toFixed(1)}m` },
+            { label: t("finalResult.accumulatedPremium"), value: `${result.accumulatedPremium.toFixed(1)}m` },
+            { label: t("finalResult.totalRecovery"), value: `${(result.potentialRecovery + result.realisedRecovery).toFixed(1)}m` },
+            { label: t("finalResult.finalNetLoss"), value: `${result.netLoss.toFixed(1)}m` },
           ].map((item) => (
             <MetricCard key={item.label} label={item.label} value={item.value} />
           ))}

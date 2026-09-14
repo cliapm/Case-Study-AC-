@@ -147,9 +147,9 @@ export default function FacilitatorDashboardPage() {
                     </td>
                     <td className="px-3 py-3">{team.submission ? new Date(team.submission.submittedAt).toLocaleString() : "-"}</td>
                     <td className="px-3 py-3">{team.submission ? team.submission.selectedDecisionCodes.join(", ") : "-"}</td>
-                    <td className="px-3 py-3">{team.position.accumulatedPremium.toFixed(3)}m</td>
-                    <td className="px-3 py-3">{(team.position.potentialRecovery + team.position.realisedRecovery).toFixed(3)}m</td>
-                    <td className="px-3 py-3">{team.position.netLoss.toFixed(3)}m</td>
+                    <td className="px-3 py-3">{team.position.accumulatedPremium.toFixed(1)}m</td>
+                    <td className="px-3 py-3">{(team.position.potentialRecovery + team.position.realisedRecovery).toFixed(1)}m</td>
+                    <td className="px-3 py-3">{team.position.netLoss.toFixed(1)}m</td>
                   </tr>
                 ))}
               </tbody>

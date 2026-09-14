@@ -27,9 +27,9 @@ export default function FacilitatorComparisonPage() {
                 <tr key={team.id} className="border-t border-slate-200">
                   <td className="px-3 py-3 font-semibold text-[#0d2d4f]">{team.id}</td>
                   <td className="px-3 py-3">{team.variant}</td>
-                  <td className="px-3 py-3">{variantBaselines[team.variant].netLoss.toFixed(3)}m</td>
+                  <td className="px-3 py-3">{variantBaselines[team.variant].netLoss.toFixed(1)}m</td>
                   <td className="px-3 py-3">U1, U2, U4</td>
-                  <td className="px-3 py-3">{variantBaselines[team.variant].netLoss.toFixed(3)}m</td>
+                  <td className="px-3 py-3">{variantBaselines[team.variant].netLoss.toFixed(1)}m</td>
                 </tr>
               ))}
             </tbody>

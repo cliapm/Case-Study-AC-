@@ -101,7 +101,7 @@ export function calculateTeamPosition(teamId: string, stageNumber: number, selec
   updated.netLoss = Number((updated.apPaid + updated.pbPaid + updated.costs - updated.potentialRecovery - updated.accumulatedPremium).toFixed(3));
   updated.knownEffects = [
     ...effects.slice(0, 4),
-    text.netLossNote.replace("{variant}", team.variant).replace("{stage}", String(stageNumber)).replace("{value}", updated.netLoss.toFixed(3)),
+    text.netLossNote.replace("{variant}", team.variant).replace("{stage}", String(stageNumber)).replace("{value}", updated.netLoss.toFixed(1)),
   ];
 
   const result: TeamPosition = {

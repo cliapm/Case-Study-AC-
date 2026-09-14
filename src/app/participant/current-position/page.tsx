@@ -15,17 +15,17 @@ function CurrentPositionContent() {
   const position = calculateTeamPosition(teamId, team.currentStage, selectedCodes, language);
 
   const metrics = [
-    { label: t("currentPosition.apExposure"), value: `${position.apExposure.toFixed(3)}m` },
-    { label: t("currentPosition.pbExposure"), value: `${position.pbExposure.toFixed(3)}m` },
-    { label: t("currentPosition.accumulatedPremium"), value: `${position.accumulatedPremium.toFixed(3)}m` },
-    { label: t("currentPosition.apPayment"), value: `${position.apPaid.toFixed(3)}m` },
-    { label: t("currentPosition.pbPayment"), value: `${position.pbPaid.toFixed(3)}m` },
-    { label: t("currentPosition.costs"), value: `${position.costs.toFixed(3)}m` },
-    { label: t("currentPosition.securedProtections"), value: `${position.reserve.toFixed(3)}m` },
-    { label: t("currentPosition.potentialRecoveries"), value: `${position.potentialRecovery.toFixed(3)}m` },
-    { label: t("currentPosition.realisedRecoveries"), value: `${position.realisedRecovery.toFixed(3)}m` },
-    { label: t("currentPosition.currentReserve"), value: `${Math.max(position.netLoss, 0).toFixed(3)}m` },
-    { label: t("currentPosition.estimatedNetLoss"), value: `${position.netLoss.toFixed(3)}m` },
+    { label: t("currentPosition.apExposure"), value: `${position.apExposure.toFixed(1)}m` },
+    { label: t("currentPosition.pbExposure"), value: `${position.pbExposure.toFixed(1)}m` },
+    { label: t("currentPosition.accumulatedPremium"), value: `${position.accumulatedPremium.toFixed(1)}m` },
+    { label: t("currentPosition.apPayment"), value: `${position.apPaid.toFixed(1)}m` },
+    { label: t("currentPosition.pbPayment"), value: `${position.pbPaid.toFixed(1)}m` },
+    { label: t("currentPosition.costs"), value: `${position.costs.toFixed(1)}m` },
+    { label: t("currentPosition.securedProtections"), value: `${position.reserve.toFixed(1)}m` },
+    { label: t("currentPosition.potentialRecoveries"), value: `${position.potentialRecovery.toFixed(1)}m` },
+    { label: t("currentPosition.realisedRecoveries"), value: `${position.realisedRecovery.toFixed(1)}m` },
+    { label: t("currentPosition.currentReserve"), value: `${Math.max(position.netLoss, 0).toFixed(1)}m` },
+    { label: t("currentPosition.estimatedNetLoss"), value: `${position.netLoss.toFixed(1)}m` },
   ];
 
   return (

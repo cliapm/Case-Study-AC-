@@ -29,13 +29,13 @@ function CaseOverviewContent() {
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-2xl font-bold text-[#0d2d4f]">{t("caseOverview.projectProfile")}</h2>
             <ul className="mt-5 space-y-3 text-sm text-slate-700">
-              <li><strong className="text-slate-900">{t("caseOverview.project")}:</strong> Desalination plant in Peru</li>
-              <li><strong className="text-slate-900">{t("caseOverview.contract")}:</strong> Public EPC contract</li>
-              <li><strong className="text-slate-900">{t("caseOverview.contractValue")}:</strong> USD 600 million</li>
-              <li><strong className="text-slate-900">{t("caseOverview.originalTerm")}:</strong> 48 months</li>
-              <li><strong className="text-slate-900">{t("caseOverview.assistedOperation")}:</strong> 24 months</li>
-              <li><strong className="text-slate-900">{t("caseOverview.apBond")}:</strong> USD 120 million</li>
-              <li><strong className="text-slate-900">{t("caseOverview.pbBond")}:</strong> USD 60 million</li>
+              <li><strong className="text-slate-900">{t("caseOverview.project")}:</strong> {t("caseOverview.projectValue")}</li>
+              <li><strong className="text-slate-900">{t("caseOverview.contract")}:</strong> {t("caseOverview.contractTypeValue")}</li>
+              <li><strong className="text-slate-900">{t("caseOverview.contractValue")}:</strong> {t("caseOverview.contractValueAmount")}</li>
+              <li><strong className="text-slate-900">{t("caseOverview.originalTerm")}:</strong> {t("caseOverview.originalTermValue")}</li>
+              <li><strong className="text-slate-900">{t("caseOverview.assistedOperation")}:</strong> {t("caseOverview.assistedOperationValue")}</li>
+              <li><strong className="text-slate-900">{t("caseOverview.apBond")}:</strong> {t("caseOverview.apBondAmount")}</li>
+              <li><strong className="text-slate-900">{t("caseOverview.pbBond")}:</strong> {t("caseOverview.pbBondAmount")}</li>
             </ul>
           </div>
 

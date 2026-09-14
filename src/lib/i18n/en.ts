@@ -13,6 +13,18 @@ export const en = {
     apBond: "Advance Payment Bond", pbBond: "Performance Bond",
     assignedVariant: "Assigned variant", jvStructure: "Joint venture structure",
     proceedButton: "Proceed to current stage",
+    projectValue: "Desalination plant in Peru", contractTypeValue: "Public EPC contract",
+    contractValueAmount: "USD 600 million", originalTermValue: "48 months", assistedOperationValue: "24 months",
+    apBondAmount: "USD 120 million", pbBondAmount: "USD 60 million",
+  },
+  home: {
+    badge: "Confidential training exercise", liveEventAccess: "Live event access", participantLogin: "Participant Login",
+    contractValueLabel: "Contract value", bondValuesLabel: "Bond values", bondValuesAmount: "AP 120m / PB 60m",
+    accessNotice: "Select your team to enter the simulation.", enterButton: "Enter Simulation", facilitatorAccess: "Facilitator access",
+    caseStatus: "Case status", currentRelease: "Current release",
+    releaseDescription: "Stage 4 is open for participating teams, with live monitoring and decision lock management available to facilitators.",
+    statTeams: "28 teams and 224 participants", statVariants: "4 variants: A, B, C and D",
+    statStages: "5 sequential stages", statDecisions: "3 decisions per stage",
   },
   currentStage: {
     label: "Current stage", openBadge: "Open", team: "Team", selectedCount: "of 3 selected",

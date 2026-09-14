@@ -13,6 +13,18 @@ export const es = {
     apBond: "Garantía de Pago Anticipado", pbBond: "Garantía de Cumplimiento",
     assignedVariant: "Variante asignada", jvStructure: "Estructura del consorcio",
     proceedButton: "Continuar a la etapa actual",
+    projectValue: "Planta desalinizadora en Perú", contractTypeValue: "Contrato EPC público",
+    contractValueAmount: "USD 600 millones", originalTermValue: "48 meses", assistedOperationValue: "24 meses",
+    apBondAmount: "USD 120 millones", pbBondAmount: "USD 60 millones",
+  },
+  home: {
+    badge: "Ejercicio de capacitación confidencial", liveEventAccess: "Acceso al evento en vivo", participantLogin: "Inicio de sesión del participante",
+    contractValueLabel: "Valor del contrato", bondValuesLabel: "Valores de las garantías", bondValuesAmount: "Pago anticipado 120m / Cumplimiento 60m",
+    accessNotice: "Selecciona tu equipo para ingresar a la simulación.", enterButton: "Entrar a la simulación", facilitatorAccess: "Acceso de facilitador",
+    caseStatus: "Estado del caso", currentRelease: "Liberación actual",
+    releaseDescription: "La etapa 4 está abierta para los equipos participantes, con monitoreo en vivo y gestión de bloqueo de decisiones disponible para los facilitadores.",
+    statTeams: "28 equipos y 224 participantes", statVariants: "4 variantes: A, B, C y D",
+    statStages: "5 etapas secuenciales", statDecisions: "3 decisiones por etapa",
   },
   currentStage: {
     label: "Etapa actual", openBadge: "Abierta", team: "Equipo", selectedCount: "de 3 seleccionadas",
