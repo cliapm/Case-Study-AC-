@@ -15,11 +15,17 @@ type LanguageContextValue = {
   t: (path: string) => string;
 };
 
-const LanguageContext = createContext<LanguageContextValue | null>(null);
-
 function getValueAtPath(obj: any, path: string): string {
   return path.split(".").reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj) ?? path;
 }
+
+const defaultValue: LanguageContextValue = {
+  language: "en",
+  setLanguage: () => {},
+  t: (path: string) => getValueAtPath(en, path),
+};
+
+const LanguageContext = createContext<LanguageContextValue>(defaultValue);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>("en");
@@ -46,7 +52,5 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useLanguage() {
-  const context = useContext(LanguageContext);
-  if (!context) throw new Error("useLanguage must be used within a LanguageProvider");
-  return context;
+  return useContext(LanguageContext);
 }
