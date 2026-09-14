@@ -62,3 +62,16 @@ export async function setReleasedStage(stageNumber: number) {
   await redis.set(RELEASED_STAGE_KEY, stageNumber);
   return stageNumber;
 }
+
+export async function resetSimulation(teamIds: string[], totalStages: number) {
+  const redis = getRedisClient();
+  if (!redis) throw new Error("Redis is not configured");
+  const keys = teamIds.flatMap((teamId) =>
+    Array.from({ length: totalStages }, (_, i) => submissionKey(teamId, i + 1)),
+  );
+  if (keys.length > 0) {
+    await redis.del(...keys);
+  }
+  await redis.set(RELEASED_STAGE_KEY, 1);
+  return 1;
+}

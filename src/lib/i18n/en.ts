@@ -77,6 +77,8 @@ export const en = {
     colDecisionCodes: "Decision codes", colPremium: "Premium", colRecovery: "Recovery", colNetLoss: "Net loss",
     submittedStatus: "Submitted", waitingStatus: "Waiting",
     confirmRelease: "Release Stage {stage}? All teams will be able to move forward immediately.",
+    resetButton: "Reset simulation", resetting: "Resetting...",
+    confirmReset: "Reset the entire simulation to Stage 1? This will permanently delete every team's submitted decisions across all stages. This cannot be undone.",
   },
   facilitatorQr: {
     label: "QR access", title: "Participant Login QR", downloadButton: "Download QR image",

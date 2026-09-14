@@ -26,6 +26,7 @@ export default function FacilitatorDashboardPage() {
   const [releasedStage, setReleasedStage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isReleasing, setIsReleasing] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const fetchTeams = async () => {
     try {
@@ -66,6 +67,22 @@ export default function FacilitatorDashboardPage() {
     }
   };
 
+  const handleResetSimulation = async () => {
+    if (!confirm(t("facilitatorDashboard.confirmReset"))) return;
+    setIsResetting(true);
+    try {
+      const res = await fetch("/api/facilitator/reset-simulation", { method: "POST" });
+      const data = await res.json();
+      setReleasedStage(data.stageNumber);
+      setStageNumber(data.stageNumber);
+      await fetchTeams();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   const totalTeams = teams.length || 28;
 
   return (
@@ -87,6 +104,13 @@ export default function FacilitatorDashboardPage() {
             </button>
             <Link href="/facilitator/comparison" className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700">{t("facilitatorDashboard.comparisonScreen")}</Link>
             <a href="/api/facilitator/export-csv" className="rounded-xl bg-[#0d2d4f] px-4 py-2 font-semibold text-white">{t("facilitatorDashboard.exportCsv")}</a>
+            <button
+              onClick={handleResetSimulation}
+              disabled={isResetting}
+              className="rounded-xl border border-[#9e1b2b] bg-white px-4 py-2 font-semibold text-[#9e1b2b] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isResetting ? t("facilitatorDashboard.resetting") : t("facilitatorDashboard.resetButton")}
+            </button>
           </div>
         </header>
 

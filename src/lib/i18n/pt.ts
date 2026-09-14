@@ -77,6 +77,8 @@ export const pt = {
     colDecisionCodes: "Códigos de decisão", colPremium: "Prêmio", colRecovery: "Recuperação", colNetLoss: "Perda líquida",
     submittedStatus: "Enviado", waitingStatus: "Aguardando",
     confirmRelease: "Liberar a etapa {stage}? Todas as equipes poderão avançar imediatamente.",
+    resetButton: "Reiniciar simulação", resetting: "Reiniciando...",
+    confirmReset: "Reiniciar toda a simulação para a Etapa 1? Isso excluirá permanentemente as decisões enviadas por todas as equipes em todas as etapas. Esta ação não pode ser desfeita.",
   },
   facilitatorQr: {
     label: "Acesso QR", title: "QR de login do participante", downloadButton: "Baixar imagem QR",
