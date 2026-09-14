@@ -10,6 +10,7 @@ export default function CurrentStagePage({ searchParams }: { searchParams?: { te
   const decisions = getStageDecisions(team.currentStage);
   const [selectedCodes, setSelectedCodes] = useState<string[]>([]);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedDetails = useMemo(
     () => decisions.filter((decision) => selectedCodes.includes(decision.code)),
@@ -25,6 +26,26 @@ export default function CurrentStagePage({ searchParams }: { searchParams?: { te
   };
 
   const canSubmit = selectedCodes.length === 3;
+
+  const handleConfirmSubmission = async () => {
+    setIsSubmitting(true);
+    try {
+      await fetch("/api/submit-decision", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          teamId: team.id,
+          stageNumber: team.currentStage,
+          selectedDecisionCodes: selectedCodes,
+        }),
+      });
+      saveSelectedDecisions(team.id, team.currentStage, selectedCodes);
+      window.location.href = `/participant/waiting?team=${team.id}`;
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-6 text-slate-900">
@@ -106,15 +127,14 @@ export default function CurrentStagePage({ searchParams }: { searchParams?: { te
             </ul>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <button type="button" onClick={() => setShowConfirm(false)} className="rounded-xl border border-slate-300 bg-white px-4 py-3 font-semibold text-slate-700">Cancel</button>
-              <a
-                href={`/participant/waiting?team=${team.id}`}
-                onClick={() => {
-                  saveSelectedDecisions(team.id, team.currentStage, selectedCodes);
-                }}
-                className="rounded-xl bg-[#9e1b2b] px-4 py-3 text-center font-semibold text-white"
+              <button
+                type="button"
+                onClick={handleConfirmSubmission}
+                disabled={isSubmitting}
+                className="rounded-xl bg-[#9e1b2b] px-4 py-3 text-center font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                Confirm submission
-              </a>
+                {isSubmitting ? "Submitting..." : "Confirm submission"}
+              </button>
             </div>
           </div>
         </div>
