@@ -12,10 +12,7 @@ type Position = {
 };
 
 type TeamWithSubmission = Team & {
-  submission: {
-    selectedDecisionCodes: string[];
-    submittedAt: string;
-  } | null;
+  submission: { selectedDecisionCodes: string[]; submittedAt: string } | null;
   status: "Submitted" | "Waiting";
   position: Position;
 };
@@ -24,14 +21,21 @@ export default function FacilitatorDashboardPage() {
   const [teams, setTeams] = useState<TeamWithSubmission[]>([]);
   const [submittedCount, setSubmittedCount] = useState(0);
   const [stageNumber, setStageNumber] = useState(1);
+  const [releasedStage, setReleasedStage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [isReleasing, setIsReleasing] = useState(false);
 
   const fetchTeams = async () => {
     try {
-      const res = await fetch(`/api/facilitator/teams?stage=${stageNumber}`);
-      const data = await res.json();
+      const [teamsRes, stageRes] = await Promise.all([
+        fetch(`/api/facilitator/teams?stage=${stageNumber}`),
+        fetch("/api/stage"),
+      ]);
+      const data = await teamsRes.json();
+      const stageData = await stageRes.json();
       setTeams(data.teams ?? []);
       setSubmittedCount(data.submittedCount ?? 0);
+      setReleasedStage(stageData.stageNumber ?? 1);
     } catch (err) {
       console.error(err);
     } finally {
@@ -45,6 +49,21 @@ export default function FacilitatorDashboardPage() {
     return () => clearInterval(interval);
   }, [stageNumber]);
 
+  const handleReleaseStage = async () => {
+    if (!confirm(`Release Stage ${releasedStage + 1}? All teams will be able to move forward immediately.`)) return;
+    setIsReleasing(true);
+    try {
+      const res = await fetch("/api/facilitator/release-stage", { method: "POST" });
+      const data = await res.json();
+      setReleasedStage(data.stageNumber);
+      setStageNumber(data.stageNumber);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsReleasing(false);
+    }
+  };
+
   const totalTeams = teams.length || 28;
 
   return (
@@ -57,7 +76,13 @@ export default function FacilitatorDashboardPage() {
           </div>
           <div className="flex flex-wrap gap-3">
             <button onClick={fetchTeams} className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700">Refresh</button>
-            <button className="rounded-xl bg-[#9e1b2b] px-4 py-2 font-semibold text-white">Release Stage</button>
+            <button
+              onClick={handleReleaseStage}
+              disabled={isReleasing || releasedStage >= 5}
+              className="rounded-xl bg-[#9e1b2b] px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+            >
+              {releasedStage >= 5 ? "Final stage reached" : isReleasing ? "Releasing..." : `Release Stage ${releasedStage + 1}`}
+            </button>
             <Link href="/facilitator/comparison" className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700">Comparison screen</Link>
             <a href="/api/facilitator/export-csv" className="rounded-xl bg-[#0d2d4f] px-4 py-2 font-semibold text-white">Export CSV</a>
           </div>
@@ -65,7 +90,7 @@ export default function FacilitatorDashboardPage() {
 
         <section className="mb-6 grid gap-4 md:grid-cols-4">
           {[
-            { label: "Current released stage", value: String(stageNumber) },
+            { label: "Current released stage", value: String(releasedStage) },
             { label: "Teams submitted", value: `${submittedCount} of ${totalTeams}` },
             { label: "Teams waiting", value: String(totalTeams - submittedCount) },
             { label: "Status", value: "Live" },
@@ -90,6 +115,7 @@ export default function FacilitatorDashboardPage() {
               <option value={4}>Stage 4</option>
               <option value={5}>Stage 5</option>
             </select>
+            <span className="text-sm text-slate-500">Viewing submissions for this stage</span>
             {isLoading ? <span className="text-sm text-slate-500">Loading…</span> : null}
           </div>
 
@@ -113,20 +139,12 @@ export default function FacilitatorDashboardPage() {
                     <td className="px-3 py-3 font-semibold text-[#0d2d4f]">{team.id}</td>
                     <td className="px-3 py-3">{team.variant}</td>
                     <td className="px-3 py-3">
-                      <span
-                        className={`rounded-full px-2 py-1 text-xs font-medium ${
-                          team.status === "Submitted" ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"
-                        }`}
-                      >
+                      <span className={`rounded-full px-2 py-1 text-xs font-medium ${team.status === "Submitted" ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"}`}>
                         {team.status}
                       </span>
                     </td>
-                    <td className="px-3 py-3">
-                      {team.submission ? new Date(team.submission.submittedAt).toLocaleString() : "-"}
-                    </td>
-                    <td className="px-3 py-3">
-                      {team.submission ? team.submission.selectedDecisionCodes.join(", ") : "-"}
-                    </td>
+                    <td className="px-3 py-3">{team.submission ? new Date(team.submission.submittedAt).toLocaleString() : "-"}</td>
+                    <td className="px-3 py-3">{team.submission ? team.submission.selectedDecisionCodes.join(", ") : "-"}</td>
                     <td className="px-3 py-3">{team.position.accumulatedPremium.toFixed(3)}m</td>
                     <td className="px-3 py-3">{(team.position.potentialRecovery + team.position.realisedRecovery).toFixed(3)}m</td>
                     <td className="px-3 py-3">{team.position.netLoss.toFixed(3)}m</td>
