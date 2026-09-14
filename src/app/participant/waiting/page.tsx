@@ -2,8 +2,9 @@ import { getTeamById } from "@/lib/simulation";
 import { getTeamSubmission } from "@/lib/kv";
 import Link from "next/link";
 
-export default async function WaitingScreenPage({ searchParams }: { searchParams?: { team?: string } }) {
-  const teamId = searchParams?.team ?? "A1";
+export default async function WaitingScreenPage({ searchParams }: { searchParams?: Promise<{ team?: string }> }) {
+  const params = await searchParams;
+  const teamId = params?.team ?? "A1";
   const team = getTeamById(teamId);
   const stored = await getTeamSubmission(teamId, team.currentStage);
 
