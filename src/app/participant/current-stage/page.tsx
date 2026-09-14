@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { getStageDecisions, getTeamById } from "@/lib/simulation";
 import { saveSelectedDecisions } from "@/lib/team-store";
 
-export default function CurrentStagePage({ searchParams }: { searchParams?: { team?: string } }) {
-  const teamId = searchParams?.team ?? "A1";
+export default function CurrentStagePage() {
+  const searchParams = useSearchParams();
+  const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
   const decisions = getStageDecisions(team.currentStage);
   const [selectedCodes, setSelectedCodes] = useState<string[]>([]);
