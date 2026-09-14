@@ -44,6 +44,8 @@ export const pt = {
     summaryTitle: "Resumo da posição atual",
     summaryText: "O facilitador liberará a próxima etapa depois que todas as equipes tiverem seus envios travados. Esta página verifica automaticamente em segundo plano — não é necessário atualizá-la.",
     viewPosition: "Ver posição calculada", continueToStage: "Continuar para a etapa",
+    completedTitle: "Simulação concluída", completedText: "Você enviou decisões para todas as cinco etapas. Veja seu resultado final abaixo.",
+    viewFinalResult: "Ver resultado final",
   },
   currentPosition: {
     label: "Posição atual", apExposure: "Exposição da Garantia de Pagamento Antecipado", pbExposure: "Exposição da Garantia de Desempenho",

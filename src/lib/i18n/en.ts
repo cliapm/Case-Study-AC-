@@ -44,6 +44,8 @@ export const en = {
     summaryTitle: "Current position summary",
     summaryText: "The facilitator will release the next stage after all team submissions are locked. This page checks quietly in the background — no need to refresh it yourself.",
     viewPosition: "View calculated position", continueToStage: "Continue to Stage",
+    completedTitle: "Simulation complete", completedText: "You have submitted decisions for all five stages. View your final result below.",
+    viewFinalResult: "View final result",
   },
   currentPosition: {
     label: "Current position", apExposure: "Advance Payment Bond exposure", pbExposure: "Performance Bond exposure",

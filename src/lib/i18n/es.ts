@@ -44,6 +44,8 @@ export const es = {
     summaryTitle: "Resumen de la posición actual",
     summaryText: "El facilitador liberará la siguiente etapa una vez que todos los equipos hayan bloqueado sus envíos. Esta página se actualiza automáticamente en segundo plano; no es necesario recargarla.",
     viewPosition: "Ver posición calculada", continueToStage: "Continuar a la etapa",
+    completedTitle: "Simulación completada", completedText: "Has enviado decisiones para las cinco etapas. Consulta tu resultado final a continuación.",
+    viewFinalResult: "Ver resultado final",
   },
   currentPosition: {
     label: "Posición actual", apExposure: "Exposición de la Garantía de Pago Anticipado", pbExposure: "Exposición de la Garantía de Cumplimiento",

@@ -4,9 +4,12 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getTeamById } from "@/lib/simulation";
+import { stages } from "@/lib/mock-data";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 type Submission = { selectedDecisionCodes: string[]; stageNumber: number } | null;
+
+const TOTAL_STAGES = stages.length;
 
 function WaitingContent() {
   const { t } = useLanguage();
@@ -14,6 +17,7 @@ function WaitingContent() {
   const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
   const submittedStage = Number(searchParams.get("stage") ?? "1");
+  const isFinalStage = submittedStage >= TOTAL_STAGES;
 
   const [stored, setStored] = useState<Submission>(null);
   const [releasedStage, setReleasedStage] = useState(submittedStage);
@@ -45,14 +49,14 @@ function WaitingContent() {
     };
   }, [teamId, submittedStage]);
 
-  const nextStageAvailable = releasedStage > submittedStage;
+  const nextStageAvailable = !isFinalStage && releasedStage > submittedStage;
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900">
       <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">{t("waiting.submissionConfirmed")}</p>
         <h1 className="mt-3 text-3xl font-bold text-[#0d2d4f]">
-          {nextStageAvailable ? t("waiting.releasedTitle") : t("waiting.waitingTitle")}
+          {isFinalStage ? t("waiting.completedTitle") : nextStageAvailable ? t("waiting.releasedTitle") : t("waiting.waitingTitle")}
         </h1>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -71,7 +75,12 @@ function WaitingContent() {
           <p className="mt-2">{isLoading ? t("waiting.loading") : stored?.selectedDecisionCodes?.join(", ") ?? t("waiting.noSubmission")}</p>
         </div>
 
-        {nextStageAvailable ? (
+        {isFinalStage ? (
+          <div className="mt-6 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-800">
+            <p className="font-medium">{t("waiting.completedTitle")}</p>
+            <p className="mt-2">{t("waiting.completedText")}</p>
+          </div>
+        ) : nextStageAvailable ? (
           <div className="mt-6 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-800">
             <p className="font-medium">{t("common.stage")} {releasedStage} {t("waiting.nowOpen")}</p>
             <p className="mt-2">{t("waiting.continueNext")}</p>
@@ -84,7 +93,9 @@ function WaitingContent() {
         )}
 
         <div className="mt-6 flex flex-wrap gap-3">
-          {stored ? (
+          {isFinalStage && stored ? (
+            <Link href={`/participant/final-result?team=${team.id}&codes=${stored.selectedDecisionCodes.join(",")}`} className="inline-flex rounded-xl bg-[#0d2d4f] px-4 py-3 font-semibold text-white">{t("waiting.viewFinalResult")}</Link>
+          ) : stored ? (
             <Link href={`/participant/current-position?team=${team.id}&codes=${stored.selectedDecisionCodes.join(",")}`} className="inline-flex rounded-xl bg-[#0d2d4f] px-4 py-3 font-semibold text-white">{t("waiting.viewPosition")}</Link>
           ) : null}
           {nextStageAvailable ? (
