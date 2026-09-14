@@ -46,3 +46,19 @@ export async function getTeamSubmission(teamId: string, stageNumber: number) {
   if (!raw) return null;
   return typeof raw === "string" ? JSON.parse(raw) : raw;
 }
+const RELEASED_STAGE_KEY = "released-stage-number";
+
+export async function getReleasedStage(): Promise<number> {
+  const redis = getRedisClient();
+  if (!redis) return 1;
+  const value = await redis.get<number | string>(RELEASED_STAGE_KEY);
+  if (!value) return 1;
+  return Number(value);
+}
+
+export async function setReleasedStage(stageNumber: number) {
+  const redis = getRedisClient();
+  if (!redis) throw new Error("Redis is not configured");
+  await redis.set(RELEASED_STAGE_KEY, stageNumber);
+  return stageNumber;
+}
