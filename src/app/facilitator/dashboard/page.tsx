@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { variantBaselines } from "@/lib/mock-data";
 import type { Team } from "@/lib/types";
+
+type Position = {
+  accumulatedPremium: number;
+  potentialRecovery: number;
+  realisedRecovery: number;
+  netLoss: number;
+};
 
 type TeamWithSubmission = Team & {
   submission: {
@@ -11,6 +17,7 @@ type TeamWithSubmission = Team & {
     submittedAt: string;
   } | null;
   status: "Submitted" | "Waiting";
+  position: Position;
 };
 
 export default function FacilitatorDashboardPage() {
@@ -120,9 +127,9 @@ export default function FacilitatorDashboardPage() {
                     <td className="px-3 py-3">
                       {team.submission ? team.submission.selectedDecisionCodes.join(", ") : "-"}
                     </td>
-                    <td className="px-3 py-3">{variantBaselines[team.variant].accumulatedPremium.toFixed(3)}m</td>
-                    <td className="px-3 py-3">{variantBaselines[team.variant].recovery.toFixed(3)}m</td>
-                    <td className="px-3 py-3">{variantBaselines[team.variant].netLoss.toFixed(3)}m</td>
+                    <td className="px-3 py-3">{team.position.accumulatedPremium.toFixed(3)}m</td>
+                    <td className="px-3 py-3">{(team.position.potentialRecovery + team.position.realisedRecovery).toFixed(3)}m</td>
+                    <td className="px-3 py-3">{team.position.netLoss.toFixed(3)}m</td>
                   </tr>
                 ))}
               </tbody>
