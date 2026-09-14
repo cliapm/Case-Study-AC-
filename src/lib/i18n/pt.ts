@@ -69,4 +69,12 @@ export const pt = {
   facilitatorLoading: {
     label: "Status da simulação", title: "Carregando painel do facilitador",
   },
+  participantLogin: {
+    title: "Simulação Integrada de Subscrição, Sinistros e Recuperação", confidential: "Confidencial",
+    noticeLabel: "Aviso de exercício de treinamento",
+    noticeText: "Esta simulação reflete um exercício confidencial de subscrição, sinistros e recuperação. O acesso da equipe é restrito ao grupo designado e às suas próprias decisões.",
+    noticeRule: "As equipes devem enviar exatamente três decisões por etapa e permanecer dentro do prazo da etapa liberada.",
+    selectTeamLabel: "Selecione sua equipe", variantLabel: "Variante",
+    enterButton: "Entrar na simulação", backHome: "Voltar ao início",
+  },
 };

@@ -69,4 +69,12 @@ export const en = {
   facilitatorLoading: {
     label: "Simulation status", title: "Loading facilitator dashboard",
   },
+  participantLogin: {
+    title: "Integrated Underwriting, Claims and Recovery Simulation", confidential: "Confidential",
+    noticeLabel: "Training exercise notice",
+    noticeText: "This simulation reflects a confidential underwriting, claims and recovery exercise. Team access is restricted to the assigned group and its own decisions.",
+    noticeRule: "Teams must submit exactly three decisions per stage and remain within the released stage timeline.",
+    selectTeamLabel: "Select your team", variantLabel: "Variant",
+    enterButton: "Enter Simulation", backHome: "Return to home",
+  },
 };

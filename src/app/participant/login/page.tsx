@@ -3,28 +3,19 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-const TEAM_CODES = ["A1","A2","A3","A4","A5","A6","A7","B1","B2","B3","B4","B5","B6","B7","C1","C2","C3","C4","C5","C6","C7","D1","D2","D3","D4","D5","D6","D7"];
+const VARIANTS = ["A", "B", "C", "D"] as const;
+const TEAM_CODES = VARIANTS.flatMap((variant) => Array.from({ length: 7 }, (_, i) => `${variant}${i + 1}`));
 
 export default function ParticipantLoginPage() {
+  const { t } = useLanguage();
   const router = useRouter();
-  const [groupId, setGroupId] = useState("A1");
-  const [accessCode, setAccessCode] = useState("agua123");
-  const [error, setError] = useState("");
+  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const normalizedTeamId = groupId.trim().toUpperCase();
-    if (!TEAM_CODES.includes(normalizedTeamId)) {
-      setError("Please enter a valid team ID.");
-      return;
-    }
-    if (!accessCode.trim()) {
-      setError("Please enter the team access code.");
-      return;
-    }
-    setGroupId(normalizedTeamId);
-    router.push(`/participant/case-overview?team=${normalizedTeamId}`);
+  const handleEnter = () => {
+    if (!selectedTeam) return;
+    router.push(`/participant/case-overview?team=${selectedTeam}`);
   };
 
   return (
@@ -32,43 +23,62 @@ export default function ParticipantLoginPage() {
       <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-8 flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">Project Agua Clara</p>
-            <h1 className="mt-3 text-3xl font-bold text-[#0d2d4f]">Integrated Underwriting, Claims and Recovery Simulation</h1>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9e1b2b]">{t("brand.tag")}</p>
+            <h1 className="mt-3 text-3xl font-bold text-[#0d2d4f]">{t("participantLogin.title")}</h1>
           </div>
-          <div className="hidden rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-slate-600 sm:block">Confidential</div>
+          <div className="hidden rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-slate-600 sm:block">{t("participantLogin.confidential")}</div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
           <section className="rounded-3xl bg-slate-50 p-5">
-            <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Training exercise notice</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">{t("participantLogin.noticeLabel")}</p>
             <p className="mt-4 text-base leading-7 text-slate-700">
-              This simulation reflects a confidential underwriting, claims and recovery exercise. Team access is restricted to the assigned group and its own decisions.
+              {t("participantLogin.noticeText")}
             </p>
             <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-600">
-              Teams must submit exactly three decisions per stage and remain within the released stage timeline.
+              {t("participantLogin.noticeRule")}
             </div>
           </section>
 
           <section>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label htmlFor="group-id" className="mb-2 block text-sm font-medium text-slate-700">Group ID</label>
-                <input id="group-id" value={groupId} onChange={(event) => setGroupId(event.target.value.toUpperCase())} className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-3 text-slate-900 focus:border-[#0d2d4f]" placeholder="A1" />
-              </div>
-              <div>
-                <label htmlFor="access-code" className="mb-2 block text-sm font-medium text-slate-700">Unique access code</label>
-                <input id="access-code" type="password" value={accessCode} onChange={(event) => setAccessCode(event.target.value)} className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-3 text-slate-900 focus:border-[#0d2d4f]" placeholder="Enter access code" />
-              </div>
+            <p className="mb-3 text-sm font-medium text-slate-700">{t("participantLogin.selectTeamLabel")}</p>
+            <div className="space-y-4">
+              {VARIANTS.map((variant) => (
+                <div key={variant}>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">{t("participantLogin.variantLabel")} {variant}</p>
+                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-7 md:grid-cols-4">
+                    {TEAM_CODES.filter((code) => code.startsWith(variant)).map((code) => (
+                      <button
+                        key={code}
+                        type="button"
+                        onClick={() => setSelectedTeam(code)}
+                        className={`rounded-xl border px-3 py-2 text-sm font-semibold transition ${
+                          selectedTeam === code
+                            ? "border-[#9e1b2b] bg-[#9e1b2b] text-white"
+                            : "border-slate-300 bg-slate-50 text-slate-700 hover:border-[#9e1b2b]"
+                        }`}
+                      >
+                        {code}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
 
-              {error ? <p className="text-sm font-medium text-[#9e1b2b]">{error}</p> : null}
-
-              <button type="submit" className="w-full rounded-xl bg-[#9e1b2b] px-4 py-3 text-base font-semibold text-white hover:bg-[#7d1524]">Enter Simulation</button>
-            </form>
+            <button
+              type="button"
+              onClick={handleEnter}
+              disabled={!selectedTeam}
+              className="mt-6 w-full rounded-xl bg-[#9e1b2b] px-4 py-3 text-base font-semibold text-white transition hover:bg-[#7d1524] disabled:cursor-not-allowed disabled:bg-slate-300"
+            >
+              {t("participantLogin.enterButton")}
+            </button>
           </section>
         </div>
 
         <div className="mt-8 text-center">
-          <Link href="/" className="text-sm font-medium text-[#0d2d4f] underline">Return to home</Link>
+          <Link href="/" className="text-sm font-medium text-[#0d2d4f] underline">{t("participantLogin.backHome")}</Link>
         </div>
       </div>
     </main>

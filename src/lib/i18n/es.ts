@@ -69,4 +69,12 @@ export const es = {
   facilitatorLoading: {
     label: "Estado de la simulación", title: "Cargando panel del facilitador",
   },
+  participantLogin: {
+    title: "Simulación Integrada de Suscripción, Reclamos y Recuperación", confidential: "Confidencial",
+    noticeLabel: "Aviso de ejercicio de capacitación",
+    noticeText: "Esta simulación refleja un ejercicio confidencial de suscripción, reclamos y recuperación. El acceso del equipo está restringido al grupo asignado y a sus propias decisiones.",
+    noticeRule: "Los equipos deben enviar exactamente tres decisiones por etapa y mantenerse dentro del plazo de la etapa liberada.",
+    selectTeamLabel: "Selecciona tu equipo", variantLabel: "Variante",
+    enterButton: "Entrar a la simulación", backHome: "Volver al inicio",
+  },
 };
