@@ -1,11 +1,11 @@
 import { getTeamById } from "@/lib/simulation";
-import { getStoredSubmission } from "@/lib/team-store";
+import { getTeamSubmission } from "@/lib/kv";
 import Link from "next/link";
 
-export default function WaitingScreenPage({ searchParams }: { searchParams?: { team?: string } }) {
+export default async function WaitingScreenPage({ searchParams }: { searchParams?: { team?: string } }) {
   const teamId = searchParams?.team ?? "A1";
   const team = getTeamById(teamId);
-  const stored = getStoredSubmission(teamId);
+  const stored = await getTeamSubmission(teamId, team.currentStage);
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900">
