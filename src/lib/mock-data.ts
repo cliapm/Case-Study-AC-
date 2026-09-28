@@ -7,24 +7,19 @@ export const variantLabels: Record<Variant, string> = {
 };
 
 export type VariantBaseline = {
-  apExposure: number;
-  pbExposure: number;
-  apPaidBase: number;
-  pbPaidBase: number;
-  costsBase: number;
-  premiumBase: number;
-  recoveryCap: number;
+  // Base counter-indemnity recovery realisable via C5, before R3's +3m bonus.
+  recoveryCiBase: number;
+  // Aggregate ceiling across every recovery channel combined (C4 + C5 + C6).
+  recoveryCeiling: number;
 };
 
-// Costs/AP/PB/premium/recovery are the zero-decision starting position for each variant.
-// Variant A's costsBase (7.2) is back-solved from the confidential matrix's Variant A row
-// (6.2), which the master document states assumes C2 was selected (C2: -1.0 costs).
-// Variant B/C's matrix rows are the zero-decision figures directly (no assumption noted),
-// so their costsBase matches the matrix as-is.
+// Per §8 "Economic effects by Code" (master document v7): Variants A and B share the
+// same recovery structure (joint counter-indemnity from all three JV members); Variant C
+// is capped much lower (Iberagua's direct obligation only).
 export const variantBaselines: Record<Variant, VariantBaseline> = {
-  A: { apExposure: 30, pbExposure: 60, apPaidBase: 30, pbPaidBase: 60, costsBase: 7.2, premiumBase: 6.96, recoveryCap: 43 },
-  B: { apExposure: 30, pbExposure: 60, apPaidBase: 30, pbPaidBase: 60, costsBase: 3.0, premiumBase: 6.96, recoveryCap: 43 },
-  C: { apExposure: 30, pbExposure: 60, apPaidBase: 30, pbPaidBase: 60, costsBase: 3.8, premiumBase: 6.96, recoveryCap: 8 },
+  A: { recoveryCiBase: 40, recoveryCeiling: 43 },
+  B: { recoveryCiBase: 40, recoveryCeiling: 43 },
+  C: { recoveryCiBase: 5, recoveryCeiling: 8 },
 };
 
 export const teamList: Team[] = Array.from({ length: 30 }, (_, index) => {

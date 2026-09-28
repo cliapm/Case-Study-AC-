@@ -25,26 +25,49 @@ export function getVariantTeamSummary(variant: Variant) {
 }
 
 const FINAL_STAGE_NUMBER = 4;
+// The Advance Payment Bond's full, unreduced face value (20% of the USD 600m contract).
+// Stage 1's own "position returned" instruction says "AP and PB exposure maintained" —
+// still the full bond amount. The amortised-down balance below is a fact the story only
+// reveals from Stage 2 onward.
+const AP_BOND_FACE_VALUE = 120;
+// Outstanding unamortised balance from Stage 2 onward: USD 90m of the original 120m
+// advance is formally amortised, leaving 30m — the figure ERAP later claims.
+const AP_CLAIM_BALANCE = 30;
+const PB_BOND_LIMIT = 60;
+const PREMIUM_BASE = 6.96;
 
 /**
  * Calculates a team's position given every decision it has selected across all
  * stages reached so far (selectedCodes is the cumulative history, not just the
- * latest stage's three codes) — several rules below are explicitly cross-stage
- * (e.g. T6 depends on whether R6 was picked in an earlier stage).
+ * latest stage's three codes) — several rules are explicitly cross-stage (e.g.
+ * T6 depends on whether R6 was picked in an earlier stage, and whether the
+ * recovery ceiling is reached at all depends on Stage 4 codes acting on
+ * protections created back in Stage 1/2/3).
  *
- * Rule sourcing: every numeric effect here is derived from the confidential
- * calculation matrix and its notes. Two combination rules the matrix leaves
- * genuinely underspecified for arbitrary decision combinations (the C3 global
- * settlement split between AP/PB, and which enforcement code "unlocks" which
- * created collateral) reflect a best-faith reading — see the inline notes.
+ * Rewritten against master document v7, §8 "Economic effects by Code", which
+ * replaced v6's flat confidential matrix with an explicit per-code rule set and
+ * corrected several signs the facilitator flagged after testing v6's build:
+ *  - There is no longer a per-variant starting "costs" figure — costs start at
+ *    zero and only ever increase (no decision reduces costs).
+ *  - R4, R6 and T6 are cost increases, not reductions (v6 had these backwards).
+ *  - C1/C2's AP Bond reduction and T3's AP Bond reduction only apply to Variant
+ *    A (its bond is conditional/documentary); Variants B/C are first-demand and
+ *    must pay in full regardless of audit findings or equipment preservation.
+ *  - Recovery is no longer an automatic narrative fact at the claim stage — it
+ *    is built from three separate pools (collateral via U5/R2/R5, the
+ *    counter-indemnity base +R3 bonus, and the T5/T1 bonus channels), each of
+ *    which only converts from "potential" to "realised" if its specific
+ *    enforcement code (C4, C5, C6 respectively) is picked, and the whole total
+ *    is capped both by the variant's aggregate recovery ceiling and by the
+ *    amount actually paid out under the two bonds.
+ *
+ * One combination the document still leaves unquantified for arbitrary
+ * decision paths: C3's settlement reduction is stated to apply "first to the
+ * Performance Bond payment and only thereafter to the Advance Payment Bond
+ * payment," but no magnitude is restated in v7 (v6 gave USD 4,000,000). The
+ * 4m figure and the PB-first/AP-spillover ordering below reflect that — flag
+ * to the document's author if the magnitude has changed.
  */
-// The Advance Payment Bond's full, unreduced face value (20% of the USD 600m contract).
-// Stage 1's own "position returned" instruction says "AP and PB exposure maintained" —
-// i.e. still the full bond amount. The amortised-down balance (baseline.apExposure/
-// apPaidBase, USD 30m) is a fact the story only reveals from Stage 2 onward (USD 90m of
-// the original 120m advance is amortised, leaving the 30m balance ERAP later claims).
-const AP_BOND_FACE_VALUE = 120;
-
 export function calculateTeamPosition(teamId: string, stageNumber: number, selectedCodes: string[], language: Language = "en"): TeamPosition {
   const team = getTeamById(teamId);
   const variant = team.variant;
@@ -52,9 +75,10 @@ export function calculateTeamPosition(teamId: string, stageNumber: number, selec
   const text = simulationText[language];
   const has = (code: string) => selectedCodes.includes(code);
   const isStageOne = stageNumber <= 1;
+  const isClaimStageOrLater = stageNumber >= FINAL_STAGE_NUMBER;
 
-  // --- Costs ---
-  let costs = baseline.costsBase;
+  // --- Costs: every decision that carries a cost adds to a zero baseline; nothing reduces costs. ---
+  let costs = 0;
   const u1 = has("U1");
   const u4 = has("U4");
   if (u1 && u4) {
@@ -62,65 +86,82 @@ export function calculateTeamPosition(teamId: string, stageNumber: number, selec
   } else if (u1 || u4) {
     costs += 0.5;
   }
-  if (has("R4")) costs -= 0.4;
+  if (has("R4")) costs += 0.4;
   const r6 = has("R6");
-  if (r6) costs -= 0.2;
-  if (has("T6") && !r6) costs -= 0.2; // T6's cost benefit is zeroed if R6 already gave it
+  if (r6) costs += 0.2;
+  if (has("T6") && !r6) costs += 0.2; // T6's coordination cost isn't duplicated if R6 already paid for it
   if (has("T5")) costs += 0.4;
-  if (has("T3")) costs -= 0.5;
-  const c2 = has("C2");
-  if (c2) costs -= 1.0;
-  const c3 = has("C3");
-  if (c3) costs -= 0.5;
   if (has("C6")) costs += 0.8;
 
   // --- Premium ---
-  let premium = baseline.premiumBase;
+  let premium = PREMIUM_BASE;
   if (has("U6")) premium *= 1.1;
 
-  // --- Advance Payment Bond paid ---
-  let apPaid = isStageOne ? AP_BOND_FACE_VALUE : baseline.apPaidBase;
-  if (has("C1")) apPaid -= 4;
-  if (c2) apPaid -= 4;
-  if (has("T3") && !c2) apPaid -= 2; // T3's AP reduction only applies if C2 didn't already produce a larger one
+  // --- Advance Payment Bond / Performance Bond paid ---
+  // ERAP only serves formal demands at the Claim and recovery stage. Before that,
+  // nothing has actually been paid under either bond — apExposure/pbExposure
+  // (returned separately) represent what's at stake, not money that has moved.
+  const c2 = has("C2");
+  let apPaidIfClaimed = isStageOne ? AP_BOND_FACE_VALUE : AP_CLAIM_BALANCE;
+  if (variant === "A") {
+    // Only Variant A's conditional/documentary AP Bond lets an audit or preserved
+    // equipment reduce the amount owed. Variants B/C are first-demand: paid in full.
+    if (has("C1")) apPaidIfClaimed -= 4;
+    if (c2) apPaidIfClaimed -= 4;
+    if (has("T3") && !c2) apPaidIfClaimed -= 2; // T3's reduction doesn't stack with C2's larger one
+  }
+  apPaidIfClaimed = Math.max(apPaidIfClaimed, 0);
 
-  // --- Performance Bond paid ---
-  // Variants B/C are first-demand/unconditional bonds: payable in full regardless of causation.
-  // Only Variant A's conditional wording lets a causation defence (T1) reduce the payment.
-  let pbPaid = variant === "A" && has("T1") ? 40 : baseline.pbPaidBase;
+  // Only Variant A's conditional Performance Bond lets a causation defence (T1)
+  // reduce the payment (60m -> 39.6m, the 66% JV-attributable share). Variants B/C
+  // are first-demand/unconditional: payable in full regardless of causation.
+  let pbPaidIfClaimed = variant === "A" && has("T1") ? 39.6 : PB_BOND_LIMIT;
 
-  // Global settlement (C3) reduces the net amount still payable, applied after the
-  // bond-specific reductions above. Modelled here against the PB payment.
-  if (c3) pbPaid -= 4;
+  // Global settlement (C3) applies first to the Performance Bond, then spills any
+  // remainder onto the Advance Payment Bond.
+  if (has("C3")) {
+    const pbReduction = Math.min(4, pbPaidIfClaimed);
+    pbPaidIfClaimed -= pbReduction;
+    const remainder = 4 - pbReduction;
+    if (remainder > 0) apPaidIfClaimed = Math.max(apPaidIfClaimed - remainder, 0);
+  }
+  pbPaidIfClaimed = Math.max(pbPaidIfClaimed, 0);
 
-  apPaid = Math.max(apPaid, 0);
-  pbPaid = Math.max(pbPaid, 0);
+  const apPaid = isClaimStageOrLater ? apPaidIfClaimed : 0;
+  const pbPaid = isClaimStageOrLater ? pbPaidIfClaimed : 0;
 
   // --- Recovery ---
-  // The counter-indemnity ceiling (43m for A/B, 8m for C) is a fact of the case narrative,
-  // not something a decision "creates" — it becomes realised once the team reaches the
-  // Claim and recovery stage. Two variant-specific bonus channels exist beyond the ceiling:
-  // T5's cross-border corporate-asset potential (A/B, realised via C5) and, for Variant B
-  // only, T1's additional potential when combined with C6.
-  const isClaimStageOrLater = stageNumber >= FINAL_STAGE_NUMBER;
-  let potentialRecovery = baseline.recoveryCap;
-  let realisedRecovery = isClaimStageOrLater ? baseline.recoveryCap : 0;
-  if (variant !== "C" && has("T5")) {
-    potentialRecovery += 3;
-    if (has("C5")) realisedRecovery += 3;
+  // Three separate potential pools, each requiring its own enforcement code to convert
+  // into realised recovery:
+  //  - collateral (U5 + R2 + R5, up to 37m combined) -> realised via C4. Zero for
+  //    Variant C, whose bond structure gives no enforceable recovery through these.
+  //  - counter-indemnity (40m base for A/B, 5m for C; +3m if R3 was selected) -> C5.
+  //  - bonus (T5's 3m for A/B, T1's 2m for B only) -> C6.
+  // The combined total is capped both by the variant's aggregate recovery ceiling and
+  // by the amount actually paid out under the two bonds.
+  let collateralPotential = 0;
+  if (variant !== "C") {
+    if (has("U5")) collateralPotential += 15;
+    if (has("R2")) collateralPotential += 12;
+    if (has("R5")) collateralPotential += 10;
   }
-  if (variant === "B" && has("T1")) {
-    potentialRecovery += 2;
-    if (has("C6")) realisedRecovery += 2;
-  }
+  const counterIndemnityPotential = baseline.recoveryCiBase + (has("R3") ? 3 : 0);
+  const t5Potential = variant !== "C" && has("T5") ? 3 : 0;
+  const t1BonusPotential = variant === "B" && has("T1") ? 2 : 0;
 
-  // --- Secured protections ---
-  // Collateral created by U5/R2/R5 is tracked here informationally. Per the master document's
-  // non-duplication rule, it backs the same capped recovery above rather than adding to it.
-  let reserve = 0;
-  if (has("U5")) reserve += 15;
-  if (has("R2")) reserve += 12;
-  if (has("R5")) reserve += 10;
+  const potentialRecovery = Math.min(
+    collateralPotential + counterIndemnityPotential + t5Potential + t1BonusPotential,
+    baseline.recoveryCeiling,
+  );
+
+  let realisedRecovery = 0;
+  if (has("C4")) realisedRecovery += collateralPotential;
+  if (has("C5")) realisedRecovery += counterIndemnityPotential;
+  if (has("C6")) realisedRecovery += t5Potential + t1BonusPotential;
+  realisedRecovery = Math.min(realisedRecovery, baseline.recoveryCeiling, apPaid + pbPaid);
+
+  // --- Secured protections: collateral created so far, before it's realised into cash. ---
+  const reserve = collateralPotential;
 
   const netLoss = Number((apPaid + pbPaid + costs - realisedRecovery - premium).toFixed(3));
 
@@ -137,8 +178,8 @@ export function calculateTeamPosition(teamId: string, stageNumber: number, selec
   return {
     teamId,
     stageNumber,
-    apExposure: Number((isStageOne ? AP_BOND_FACE_VALUE : baseline.apExposure).toFixed(3)),
-    pbExposure: Number(baseline.pbExposure.toFixed(3)),
+    apExposure: Number((isStageOne ? AP_BOND_FACE_VALUE : AP_CLAIM_BALANCE).toFixed(3)),
+    pbExposure: Number(PB_BOND_LIMIT.toFixed(3)),
     accumulatedPremium: Number(premium.toFixed(3)),
     apPaid: Number(apPaid.toFixed(3)),
     pbPaid: Number(pbPaid.toFixed(3)),
