@@ -22,7 +22,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <nav className="hidden gap-4 text-sm font-medium text-slate-600 md:flex">
               <Link href="/participant/login">{t("nav.participant")}</Link>
               <Link href="/facilitator/login">{t("nav.facilitator")}</Link>
-              <Link href="/facilitator/qr">{t("nav.qr")}</Link>
             </nav>
             <LanguageSwitcher />
           </div>

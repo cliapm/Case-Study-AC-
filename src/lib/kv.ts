@@ -46,6 +46,26 @@ export async function getTeamSubmission(teamId: string, stageNumber: number) {
   if (!raw) return null;
   return typeof raw === "string" ? JSON.parse(raw) : raw;
 }
+
+/**
+ * Returns every decision code a team has selected across all stages reached so
+ * far, in stage order. Several calculation rules are cross-stage-dependent
+ * (e.g. a stage 3 decision's effect depends on whether a stage 2 one was
+ * picked), so callers computing a team's position need this full history,
+ * not just the latest stage's three codes.
+ */
+export async function getTeamDecisionHistory(teamId: string, totalStages: number): Promise<string[]> {
+  const redis = getRedisClient();
+  if (!redis) return [];
+  const results = await Promise.all(
+    Array.from({ length: totalStages }, (_, i) => redis.get<string>(submissionKey(teamId, i + 1))),
+  );
+  return results.flatMap((raw) => {
+    if (!raw) return [];
+    const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+    return Array.isArray(parsed?.selectedDecisionCodes) ? parsed.selectedDecisionCodes : [];
+  });
+}
 const RELEASED_STAGE_KEY = "released-stage-number";
 
 export async function getReleasedStage(): Promise<number> {

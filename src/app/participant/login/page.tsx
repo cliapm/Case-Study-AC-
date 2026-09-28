@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-const VARIANTS = ["A", "B", "C", "D"] as const;
-const TEAM_CODES = VARIANTS.flatMap((variant) => Array.from({ length: 7 }, (_, i) => `${variant}${i + 1}`));
+const VARIANTS = ["A", "B", "C"] as const;
+const TEAM_CODES = VARIANTS.flatMap((variant) => Array.from({ length: 10 }, (_, i) => `${variant}${i + 1}`));
 
 export default function ParticipantLoginPage() {
   const { t } = useLanguage();
@@ -46,7 +46,7 @@ export default function ParticipantLoginPage() {
               {VARIANTS.map((variant) => (
                 <div key={variant}>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">{t("participantLogin.variantLabel")} {variant}</p>
-                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-7 md:grid-cols-4">
+                  <div className="grid grid-cols-5 gap-2">
                     {TEAM_CODES.filter((code) => code.startsWith(variant)).map((code) => (
                       <button
                         key={code}

@@ -1,5 +1,5 @@
-import { teamList } from "@/lib/mock-data";
-import { getAllSubmissionsForStage } from "@/lib/kv";
+import { teamList, stages } from "@/lib/mock-data";
+import { getAllSubmissionsForStage, getTeamDecisionHistory } from "@/lib/kv";
 import { calculateTeamPosition } from "@/lib/simulation";
 
 export async function GET(request: Request) {
@@ -8,18 +8,21 @@ export async function GET(request: Request) {
   const teamIds = teamList.map((t) => t.id);
   const submissions = await getAllSubmissionsForStage(stageNumber, teamIds);
 
-  const teams = teamList.map((team) => {
-    const submission = submissions[team.id] ?? null;
-    const selectedCodes = submission?.selectedDecisionCodes ?? [];
-    const position = calculateTeamPosition(team.id, stageNumber, selectedCodes);
+  const teams = await Promise.all(
+    teamList.map(async (team) => {
+      const submission = submissions[team.id] ?? null;
+      const history = await getTeamDecisionHistory(team.id, stages.length);
+      const position = calculateTeamPosition(team.id, stageNumber, history);
 
-    return {
-      ...team,
-      submission,
-      status: submission ? "Submitted" : "Waiting",
-      position,
-    };
-  });
+      return {
+        ...team,
+        submission,
+        history,
+        status: submission ? "Submitted" : "Waiting",
+        position,
+      };
+    }),
+  );
 
   return Response.json({
     teams,

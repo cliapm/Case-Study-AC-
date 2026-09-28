@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Team } from "@/lib/types";
+import { stages } from "@/lib/mock-data";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+
+const TOTAL_STAGES = stages.length;
 
 type Position = {
   accumulatedPremium: number;
@@ -83,7 +86,7 @@ export default function FacilitatorDashboardPage() {
     }
   };
 
-  const totalTeams = teams.length || 28;
+  const totalTeams = teams.length || 30;
 
   return (
     <main className="min-h-screen bg-slate-100 p-4 text-slate-900 lg:p-6">
@@ -97,10 +100,10 @@ export default function FacilitatorDashboardPage() {
             <button onClick={fetchTeams} className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700">{t("facilitatorDashboard.refresh")}</button>
             <button
               onClick={handleReleaseStage}
-              disabled={isReleasing || releasedStage >= 5}
+              disabled={isReleasing || releasedStage >= TOTAL_STAGES}
               className="rounded-xl bg-[#9e1b2b] px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              {releasedStage >= 5 ? t("facilitatorDashboard.finalStageReached") : isReleasing ? t("facilitatorDashboard.releasing") : `${t("facilitatorDashboard.releaseStage")} ${releasedStage + 1}`}
+              {releasedStage >= TOTAL_STAGES ? t("facilitatorDashboard.finalStageReached") : isReleasing ? t("facilitatorDashboard.releasing") : `${t("facilitatorDashboard.releaseStage")} ${releasedStage + 1}`}
             </button>
             <Link href="/facilitator/comparison" className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700">{t("facilitatorDashboard.comparisonScreen")}</Link>
             <a href="/api/facilitator/export-csv" className="rounded-xl bg-[#0d2d4f] px-4 py-2 font-semibold text-white">{t("facilitatorDashboard.exportCsv")}</a>
@@ -135,11 +138,9 @@ export default function FacilitatorDashboardPage() {
               value={stageNumber}
               onChange={(e) => setStageNumber(Number(e.target.value))}
             >
-              <option value={1}>{t("facilitatorDashboard.stage")} 1</option>
-              <option value={2}>{t("facilitatorDashboard.stage")} 2</option>
-              <option value={3}>{t("facilitatorDashboard.stage")} 3</option>
-              <option value={4}>{t("facilitatorDashboard.stage")} 4</option>
-              <option value={5}>{t("facilitatorDashboard.stage")} 5</option>
+              {Array.from({ length: TOTAL_STAGES }, (_, i) => i + 1).map((n) => (
+                <option key={n} value={n}>{t("facilitatorDashboard.stage")} {n}</option>
+              ))}
             </select>
             <span className="text-sm text-slate-500">{t("facilitatorDashboard.viewingSubmissions")}</span>
             {isLoading ? <span className="text-sm text-slate-500">{t("facilitatorDashboard.loading")}</span> : null}
@@ -172,7 +173,7 @@ export default function FacilitatorDashboardPage() {
                     <td className="px-3 py-3">{team.submission ? new Date(team.submission.submittedAt).toLocaleString() : "-"}</td>
                     <td className="px-3 py-3">{team.submission ? team.submission.selectedDecisionCodes.join(", ") : "-"}</td>
                     <td className="px-3 py-3">{team.position.accumulatedPremium.toFixed(1)}m</td>
-                    <td className="px-3 py-3">{(team.position.potentialRecovery + team.position.realisedRecovery).toFixed(1)}m</td>
+                    <td className="px-3 py-3">{team.position.realisedRecovery.toFixed(1)}m</td>
                     <td className="px-3 py-3">{team.position.netLoss.toFixed(1)}m</td>
                   </tr>
                 ))}

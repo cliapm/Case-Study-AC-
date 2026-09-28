@@ -1,4 +1,4 @@
-export type Variant = "A" | "B" | "C" | "D";
+export type Variant = "A" | "B" | "C";
 
 export type Team = {
   id: string;
@@ -29,14 +29,6 @@ export type Stage = {
 
 export type DecisionRule = {
   decisionCode: string;
-  variant: Variant | "all";
-  ruleType: string;
-  targetMetric: string;
-  adjustmentValue: number;
-  dependencyCode?: string;
-  enforcementCode?: string;
-  stackingGroup?: string;
-  stackingCap?: number;
   confidentialExplanation: string;
 };
 

@@ -31,9 +31,13 @@ function CaseOverviewContent() {
             <ul className="mt-5 space-y-3 text-sm text-slate-700">
               <li><strong className="text-slate-900">{t("caseOverview.project")}:</strong> {t("caseOverview.projectValue")}</li>
               <li><strong className="text-slate-900">{t("caseOverview.contract")}:</strong> {t("caseOverview.contractTypeValue")}</li>
+              <li><strong className="text-slate-900">{t("caseOverview.capacity")}:</strong> {t("caseOverview.capacityValue")}</li>
+              <li><strong className="text-slate-900">{t("caseOverview.technology")}:</strong> {t("caseOverview.technologyValue")}</li>
+              <li><strong className="text-slate-900">{t("caseOverview.scope")}:</strong> {t("caseOverview.scopeValue")}</li>
               <li><strong className="text-slate-900">{t("caseOverview.contractValue")}:</strong> {t("caseOverview.contractValueAmount")}</li>
               <li><strong className="text-slate-900">{t("caseOverview.originalTerm")}:</strong> {t("caseOverview.originalTermValue")}</li>
               <li><strong className="text-slate-900">{t("caseOverview.assistedOperation")}:</strong> {t("caseOverview.assistedOperationValue")}</li>
+              <li><strong className="text-slate-900">{t("caseOverview.delayDamages")}:</strong> {t("caseOverview.delayDamagesValue")}</li>
               <li><strong className="text-slate-900">{t("caseOverview.apBond")}:</strong> {t("caseOverview.apBondAmount")}</li>
               <li><strong className="text-slate-900">{t("caseOverview.pbBond")}:</strong> {t("caseOverview.pbBondAmount")}</li>
             </ul>
@@ -52,13 +56,17 @@ function CaseOverviewContent() {
           <h2 className="text-2xl font-bold text-[#0d2d4f]">{t("caseOverview.jvStructure")}</h2>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
             {[
-              { name: "Andina Infraestructura S.A.C.", share: "35%" },
-              { name: "Iberagua Ingeniería y Construcción S.A.", share: "40%" },
-              { name: "Mediterranea Impianti S.p.A.", share: "25%" },
+              { name: "Andina Infraestructura S.A.C.", share: "35%", country: t("caseOverview.countryPeru"), responsibility: t("caseOverview.responsibilityAndina") },
+              { name: "Iberagua Ingeniería y Construcción S.A.", share: "40%", country: t("caseOverview.countrySpain"), responsibility: t("caseOverview.responsibilityIberagua") },
+              { name: "Mediterranea Impianti S.p.A.", share: "25%", country: t("caseOverview.countryItaly"), responsibility: t("caseOverview.responsibilityMediterranea") },
             ].map((member) => (
               <div key={member.name} className="rounded-2xl bg-slate-50 p-4">
                 <p className="text-sm font-medium text-slate-700">{member.name}</p>
                 <p className="mt-2 text-xl font-bold text-[#0d2d4f]">{member.share}</p>
+                <p className="mt-3 text-xs font-semibold uppercase tracking-[0.1em] text-slate-500">{t("caseOverview.jvCountry")}</p>
+                <p className="text-sm text-slate-700">{member.country}</p>
+                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.1em] text-slate-500">{t("caseOverview.jvResponsibility")}</p>
+                <p className="text-sm text-slate-700">{member.responsibility}</p>
               </div>
             ))}
           </div>

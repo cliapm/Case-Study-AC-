@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MetricCard } from "@/components/MetricCard";
@@ -14,7 +14,32 @@ function FinalResultContent() {
   const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
   const stage = Number(searchParams.get("stage") ?? stages.length);
-  const selectedCodes = searchParams.get("codes")?.split(",").filter(Boolean) ?? [];
+
+  const [selectedCodes, setSelectedCodes] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadHistory() {
+      try {
+        const res = await fetch(`/api/submission/history?team=${teamId}`);
+        const data = await res.json();
+        if (cancelled) return;
+        setSelectedCodes(Array.isArray(data.codes) ? data.codes : []);
+      } catch (err) {
+        console.error(err);
+        if (!cancelled) setSelectedCodes([]);
+      }
+    }
+    loadHistory();
+    return () => {
+      cancelled = true;
+    };
+  }, [teamId]);
+
+  if (!selectedCodes) {
+    return <main className="min-h-screen bg-slate-100 px-4 py-6 text-slate-900">{t("currentStage.loading")}</main>;
+  }
+
   const result = calculateTeamPosition(teamId, stages.length, selectedCodes, language);
 
   return (
@@ -32,7 +57,7 @@ function FinalResultContent() {
             { label: t("finalResult.finalPB"), value: `${result.pbPaid.toFixed(1)}m` },
             { label: t("finalResult.totalCosts"), value: `${result.costs.toFixed(1)}m` },
             { label: t("finalResult.accumulatedPremium"), value: `${result.accumulatedPremium.toFixed(1)}m` },
-            { label: t("finalResult.totalRecovery"), value: `${(result.potentialRecovery + result.realisedRecovery).toFixed(1)}m` },
+            { label: t("finalResult.totalRecovery"), value: `${result.realisedRecovery.toFixed(1)}m` },
             { label: t("finalResult.finalNetLoss"), value: `${result.netLoss.toFixed(1)}m` },
           ].map((item) => (
             <MetricCard key={item.label} label={item.label} value={item.value} />

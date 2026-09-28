@@ -1,11 +1,30 @@
+import { teamList, stages } from "@/lib/mock-data";
+import { getTeamDecisionHistory } from "@/lib/kv";
+import { calculateTeamPosition } from "@/lib/simulation";
+
+export const dynamic = "force-dynamic";
+
 export async function GET() {
-  const csv = [
-    "team_id,variant,current_stage,submitted,status,premium,recovery,reserve,net_loss",
-    "A1,A,1,yes,submitted,8.158,43.000,18.000,17.042",
-    "B1,B,1,yes,submitted,9.270,43.000,0.000,38.730",
-    "C1,C,1,yes,submitted,10.012,8.000,0.000,73.788",
-    "D1,D,1,yes,submitted,8.900,39.000,0.000,45.300",
-  ].join("\n");
+  const totalStages = stages.length;
+  const rows = await Promise.all(
+    teamList.map(async (team) => {
+      const history = await getTeamDecisionHistory(team.id, totalStages);
+      const position = calculateTeamPosition(team.id, totalStages, history);
+      const submitted = history.length > 0 ? "yes" : "no";
+      return [
+        team.id,
+        team.variant,
+        String(team.currentStage),
+        submitted,
+        position.accumulatedPremium.toFixed(3),
+        position.realisedRecovery.toFixed(3),
+        position.reserve.toFixed(3),
+        position.netLoss.toFixed(3),
+      ].join(",");
+    }),
+  );
+
+  const csv = ["team_id,variant,current_stage,submitted,premium,recovery,reserve,net_loss", ...rows].join("\n");
 
   return new Response(csv, {
     headers: {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MetricCard } from "@/components/MetricCard";
@@ -13,7 +13,32 @@ function CurrentPositionContent() {
   const teamId = searchParams.get("team") ?? "A1";
   const team = getTeamById(teamId);
   const stage = Number(searchParams.get("stage") ?? team.currentStage);
-  const selectedCodes = searchParams.get("codes")?.split(",").filter(Boolean) ?? [];
+
+  const [selectedCodes, setSelectedCodes] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadHistory() {
+      try {
+        const res = await fetch(`/api/submission/history?team=${teamId}`);
+        const data = await res.json();
+        if (cancelled) return;
+        setSelectedCodes(Array.isArray(data.codes) ? data.codes : []);
+      } catch (err) {
+        console.error(err);
+        if (!cancelled) setSelectedCodes([]);
+      }
+    }
+    loadHistory();
+    return () => {
+      cancelled = true;
+    };
+  }, [teamId]);
+
+  if (!selectedCodes) {
+    return <main className="min-h-screen bg-slate-100 px-4 py-6 text-slate-900">{t("currentStage.loading")}</main>;
+  }
+
   const position = calculateTeamPosition(teamId, stage, selectedCodes, language);
 
   const metrics = [

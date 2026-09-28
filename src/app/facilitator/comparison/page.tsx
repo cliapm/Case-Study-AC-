@@ -1,10 +1,34 @@
 "use client";
 
-import { teamList, variantBaselines } from "@/lib/mock-data";
+import { useEffect, useState } from "react";
+import { teamList } from "@/lib/mock-data";
+import { calculateTeamPosition } from "@/lib/simulation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
+type TeamRow = { id: string; variant: string; history: string[] };
+
 export default function FacilitatorComparisonPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [rows, setRows] = useState<TeamRow[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const res = await fetch("/api/facilitator/teams?stage=4");
+      const data = await res.json();
+      if (cancelled) return;
+      setRows((data.teams ?? []).map((team: { id: string; variant: string; history?: string[] }) => ({
+        id: team.id,
+        variant: team.variant,
+        history: team.history ?? [],
+      })));
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <main className="min-h-screen bg-slate-100 p-4 text-slate-900 lg:p-8">
       <div className="mx-auto max-w-7xl rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -23,15 +47,19 @@ export default function FacilitatorComparisonPage() {
               </tr>
             </thead>
             <tbody>
-              {teamList.map((team) => (
-                <tr key={team.id} className="border-t border-slate-200">
-                  <td className="px-3 py-3 font-semibold text-[#0d2d4f]">{team.id}</td>
-                  <td className="px-3 py-3">{team.variant}</td>
-                  <td className="px-3 py-3">{variantBaselines[team.variant].netLoss.toFixed(1)}m</td>
-                  <td className="px-3 py-3">U1, U2, U4</td>
-                  <td className="px-3 py-3">{variantBaselines[team.variant].netLoss.toFixed(1)}m</td>
-                </tr>
-              ))}
+              {(rows.length > 0 ? rows : teamList.map((team) => ({ id: team.id, variant: team.variant, history: [] as string[] }))).map((team) => {
+                const baseline = calculateTeamPosition(team.id, 4, [], language);
+                const final = calculateTeamPosition(team.id, 4, team.history, language);
+                return (
+                  <tr key={team.id} className="border-t border-slate-200">
+                    <td className="px-3 py-3 font-semibold text-[#0d2d4f]">{team.id}</td>
+                    <td className="px-3 py-3">{team.variant}</td>
+                    <td className="px-3 py-3">{baseline.netLoss.toFixed(1)}m</td>
+                    <td className="px-3 py-3">{team.history.length ? team.history.join(", ") : "-"}</td>
+                    <td className="px-3 py-3">{final.netLoss.toFixed(1)}m</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

@@ -1,5 +1,4 @@
 import { decisionCatalog, teamList, variantBaselines } from "@/lib/mock-data";
-import { getRuleForDecision } from "@/lib/rules";
 import { Team, TeamPosition, Variant } from "@/lib/types";
 import { getLocalizedRuleExplanation } from "@/lib/i18n/content";
 import { en } from "@/lib/i18n/en";
@@ -8,22 +7,6 @@ import { pt } from "@/lib/i18n/pt";
 import type { Language } from "@/lib/i18n/LanguageContext";
 
 const simulationText: Record<Language, typeof en.simulation> = { en: en.simulation, es: es.simulation, pt: pt.simulation };
-
-export type PositionSnapshot = {
-  teamId: string;
-  stageNumber: number;
-  apExposure: number;
-  pbExposure: number;
-  accumulatedPremium: number;
-  apPaid: number;
-  pbPaid: number;
-  costs: number;
-  potentialRecovery: number;
-  realisedRecovery: number;
-  reserve: number;
-  netLoss: number;
-  knownEffects: string[];
-};
 
 export function getTeamById(teamId: string) {
   return teamList.find((team) => team.id === teamId) ?? teamList[0];
@@ -41,87 +24,124 @@ export function getVariantTeamSummary(variant: Variant) {
   return teamList.filter((team) => team.variant === variant);
 }
 
+const FINAL_STAGE_NUMBER = 4;
+
+/**
+ * Calculates a team's position given every decision it has selected across all
+ * stages reached so far (selectedCodes is the cumulative history, not just the
+ * latest stage's three codes) — several rules below are explicitly cross-stage
+ * (e.g. T6 depends on whether R6 was picked in an earlier stage).
+ *
+ * Rule sourcing: every numeric effect here is derived from the confidential
+ * calculation matrix and its notes. Two combination rules the matrix leaves
+ * genuinely underspecified for arbitrary decision combinations (the C3 global
+ * settlement split between AP/PB, and which enforcement code "unlocks" which
+ * created collateral) reflect a best-faith reading — see the inline notes.
+ */
 export function calculateTeamPosition(teamId: string, stageNumber: number, selectedCodes: string[], language: Language = "en"): TeamPosition {
   const team = getTeamById(teamId);
-  const baseline = variantBaselines[team.variant];
+  const variant = team.variant;
+  const baseline = variantBaselines[variant];
   const text = simulationText[language];
+  const has = (code: string) => selectedCodes.includes(code);
 
-  const base: PositionSnapshot = {
-    teamId,
-    stageNumber,
-    apExposure: 30,
-    pbExposure: 58,
-    accumulatedPremium: baseline.accumulatedPremium,
-    apPaid: baseline.apPaid,
-    pbPaid: baseline.pbPaid,
-    costs: baseline.costs,
-    potentialRecovery: baseline.recovery,
-    realisedRecovery: 0,
-    reserve: 0,
-    netLoss: baseline.netLoss,
-    knownEffects: [
-      text.baselineNote.replace("{variant}", team.variant),
-    ],
-  };
+  // --- Costs ---
+  let costs = baseline.costsBase;
+  const u1 = has("U1");
+  const u4 = has("U4");
+  if (u1 && u4) {
+    costs += 0.8; // combined cap: U1 + U4 together max out at +0.8 (not +1.0)
+  } else if (u1 || u4) {
+    costs += 0.5;
+  }
+  if (has("R4")) costs -= 0.4;
+  const r6 = has("R6");
+  if (r6) costs -= 0.2;
+  if (has("T6") && !r6) costs -= 0.2; // T6's cost benefit is zeroed if R6 already gave it
+  if (has("T5")) costs += 0.4;
+  if (has("T3")) costs -= 0.5;
+  const c2 = has("C2");
+  if (c2) costs -= 1.0;
+  const c3 = has("C3");
+  if (c3) costs -= 0.5;
+  if (has("C6")) costs += 0.8;
 
-  let updated = { ...base };
-  const effects: string[] = [];
+  // --- Premium ---
+  let premium = baseline.premiumBase;
+  if (has("U6")) premium *= 1.1;
 
-  selectedCodes.forEach((code) => {
-    const decision = getDecisionByCode(code);
-    const rules = getRuleForDecision(code, team.variant);
-    if (!decision) return;
+  // --- Advance Payment Bond paid ---
+  let apPaid = baseline.apPaidBase;
+  if (has("C1")) apPaid -= 4;
+  if (c2) apPaid -= 4;
+  if (has("T3") && !c2) apPaid -= 2; // T3's AP reduction only applies if C2 didn't already produce a larger one
 
-    rules.forEach((rule) => {
-      if (rule.targetMetric === "accumulatedPremium") {
-        updated.accumulatedPremium += rule.adjustmentValue;
-      }
-      if (rule.targetMetric === "apPaid") {
-        updated.apPaid += rule.adjustmentValue;
-      }
-      if (rule.targetMetric === "pbPaid") {
-        updated.pbPaid += rule.adjustmentValue;
-      }
-      if (rule.targetMetric === "costs") {
-        updated.costs += rule.adjustmentValue;
-      }
-      if (rule.targetMetric === "potentialRecovery") {
-        updated.potentialRecovery += rule.adjustmentValue;
-      }
-      if (rule.targetMetric === "realisedRecovery") {
-        updated.realisedRecovery += rule.adjustmentValue;
-      }
-      if (rule.targetMetric === "securedProtections") {
-        updated.reserve += rule.adjustmentValue;
-      }
-      effects.push(`${decision.code}: ${getLocalizedRuleExplanation(decision.code, language)}`);
-    });
-  });
+  // --- Performance Bond paid ---
+  // Variants B/C are first-demand/unconditional bonds: payable in full regardless of causation.
+  // Only Variant A's conditional wording lets a causation defence (T1) reduce the payment.
+  let pbPaid = variant === "A" && has("T1") ? 40 : baseline.pbPaidBase;
 
-  updated.netLoss = Number((updated.apPaid + updated.pbPaid + updated.costs - updated.potentialRecovery - updated.accumulatedPremium).toFixed(3));
-  updated.knownEffects = [
+  // Global settlement (C3) reduces the net amount still payable, applied after the
+  // bond-specific reductions above. Modelled here against the PB payment.
+  if (c3) pbPaid -= 4;
+
+  apPaid = Math.max(apPaid, 0);
+  pbPaid = Math.max(pbPaid, 0);
+
+  // --- Recovery ---
+  // The counter-indemnity ceiling (43m for A/B, 8m for C) is a fact of the case narrative,
+  // not something a decision "creates" — it becomes realised once the team reaches the
+  // Claim and recovery stage. Two variant-specific bonus channels exist beyond the ceiling:
+  // T5's cross-border corporate-asset potential (A/B, realised via C5) and, for Variant B
+  // only, T1's additional potential when combined with C6.
+  const isClaimStageOrLater = stageNumber >= FINAL_STAGE_NUMBER;
+  let potentialRecovery = baseline.recoveryCap;
+  let realisedRecovery = isClaimStageOrLater ? baseline.recoveryCap : 0;
+  if (variant !== "C" && has("T5")) {
+    potentialRecovery += 3;
+    if (has("C5")) realisedRecovery += 3;
+  }
+  if (variant === "B" && has("T1")) {
+    potentialRecovery += 2;
+    if (has("C6")) realisedRecovery += 2;
+  }
+
+  // --- Secured protections ---
+  // Collateral created by U5/R2/R5 is tracked here informationally. Per the master document's
+  // non-duplication rule, it backs the same capped recovery above rather than adding to it.
+  let reserve = 0;
+  if (has("U5")) reserve += 15;
+  if (has("R2")) reserve += 12;
+  if (has("R5")) reserve += 10;
+
+  const netLoss = Number((apPaid + pbPaid + costs - realisedRecovery - premium).toFixed(3));
+
+  const effects = selectedCodes
+    .filter((code) => getDecisionByCode(code))
+    .map((code) => `${code}: ${getLocalizedRuleExplanation(code, language)}`);
+
+  const knownEffects = [
+    text.baselineNote.replace("{variant}", variant),
     ...effects.slice(0, 4),
-    text.netLossNote.replace("{variant}", team.variant).replace("{stage}", String(stageNumber)).replace("{value}", updated.netLoss.toFixed(1)),
+    text.netLossNote.replace("{variant}", variant).replace("{stage}", String(stageNumber)).replace("{value}", netLoss.toFixed(1)),
   ];
 
-  const result: TeamPosition = {
+  return {
     teamId,
     stageNumber,
-    apExposure: Number(updated.apExposure.toFixed(3)),
-    pbExposure: Number(updated.pbExposure.toFixed(3)),
-    accumulatedPremium: Number(updated.accumulatedPremium.toFixed(3)),
-    apPaid: Number(updated.apPaid.toFixed(3)),
-    pbPaid: Number(updated.pbPaid.toFixed(3)),
-    costs: Number(updated.costs.toFixed(3)),
-    potentialRecovery: Number(updated.potentialRecovery.toFixed(3)),
-    realisedRecovery: Number(updated.realisedRecovery.toFixed(3)),
-    reserve: Number(updated.reserve.toFixed(3)),
-    netLoss: Number(updated.netLoss.toFixed(3)),
+    apExposure: Number(baseline.apExposure.toFixed(3)),
+    pbExposure: Number(baseline.pbExposure.toFixed(3)),
+    accumulatedPremium: Number(premium.toFixed(3)),
+    apPaid: Number(apPaid.toFixed(3)),
+    pbPaid: Number(pbPaid.toFixed(3)),
+    costs: Number(costs.toFixed(3)),
+    potentialRecovery: Number(potentialRecovery.toFixed(3)),
+    realisedRecovery: Number(realisedRecovery.toFixed(3)),
+    reserve: Number(reserve.toFixed(3)),
+    netLoss,
     calculatedAt: new Date().toISOString(),
-    knownEffects: updated.knownEffects,
+    knownEffects,
   };
-
-  return result;
 }
 
 export function calculateStageSummary(teamId: string, selectedCodes: string[]) {

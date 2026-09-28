@@ -1,45 +1,34 @@
-import { DecisionRule, Variant } from "@/lib/types";
+import { DecisionRule } from "@/lib/types";
 
 export const decisionRules: DecisionRule[] = [
-  { decisionCode: "U1", variant: "all", ruleType: "Create collateral", targetMetric: "securedProtections", adjustmentValue: 8, confidentialExplanation: "The dedicated project account creates a ring-fenced control and better evidentiary trail, strengthening the claim position." },
-  { decisionCode: "U2", variant: "all", ruleType: "Preserve a recovery right", targetMetric: "potentialRecovery", adjustmentValue: 6.5, confidentialExplanation: "Quarterly reporting preserves the evidence needed to argue overpayment and advance payment reconciliation." },
-  { decisionCode: "U3", variant: "all", ruleType: "Prevention of double counting", targetMetric: "apPaid", adjustmentValue: -4, confidentialExplanation: "Conditional reductions reduce the risk that the AP bond is overdrawn or that the claim is overstated." },
-  { decisionCode: "U4", variant: "all", ruleType: "Add or subtract costs", targetMetric: "costs", adjustmentValue: 1.2, confidentialExplanation: "Independent technical review adds modest investigation cost but strengthens the evidence base." },
-  { decisionCode: "U5", variant: "all", ruleType: "Create collateral", targetMetric: "securedProtections", adjustmentValue: 15, confidentialExplanation: "The guarantee provides direct collateral tied to the advance payment exposure and can be enforced as secured value." },
-  { decisionCode: "U6", variant: "all", ruleType: "Add or subtract premium", targetMetric: "accumulatedPremium", adjustmentValue: 0.6125, confidentialExplanation: "The additional premium is charged at inception and is a direct cost of the underwriting structure." },
+  { decisionCode: "U1", confidentialExplanation: "The dedicated project account creates a ring-fenced control and a clearer evidentiary trail for the advance payment." },
+  { decisionCode: "U2", confidentialExplanation: "Quarterly reporting strengthens the evidence available if the advance payment is later questioned." },
+  { decisionCode: "U3", confidentialExplanation: "Conditioning bond reductions on ERAP confirmation reduces the risk of an unsupported release of the guarantee." },
+  { decisionCode: "U4", confidentialExplanation: "Independent technical review adds a modest cost but improves the reliability of budget and schedule assumptions." },
+  { decisionCode: "U5", confidentialExplanation: "The bank guarantee creates additional collateral tied to the advance payment exposure." },
+  { decisionCode: "U6", confidentialExplanation: "The additional premium is charged at inception and is a direct cost of the underwriting structure." },
 
-  { decisionCode: "A1", variant: "all", ruleType: "Add or subtract premium", targetMetric: "accumulatedPremium", adjustmentValue: 0.874, confidentialExplanation: "The extension premium increases materially as contract value and exposure grow." },
-  { decisionCode: "A2", variant: "all", ruleType: "Create collateral", targetMetric: "securedProtections", adjustmentValue: 25, confidentialExplanation: "The equity contribution creates a direct cash support and strengthens the project account." },
-  { decisionCode: "A3", variant: "all", ruleType: "Preserve a recovery right", targetMetric: "potentialRecovery", adjustmentValue: 25, confidentialExplanation: "Mediterranea direct indemnity preserves a valuable recovery claim against the JV member." },
-  { decisionCode: "A4", variant: "all", ruleType: "Preserve a recovery right", targetMetric: "potentialRecovery", adjustmentValue: 5, confidentialExplanation: "Joint control reduces leakage and preserves the exploitable project asset pool." },
-  { decisionCode: "A5", variant: "all", ruleType: "Add or subtract AP payment", targetMetric: "apPaid", adjustmentValue: -8, confidentialExplanation: "Blocking AP reductions holds the exposure until the reconciliation is proven and prevents premature settlement." },
-  { decisionCode: "A6", variant: "all", ruleType: "Create collateral", targetMetric: "securedProtections", adjustmentValue: 13.2, confidentialExplanation: "A portion of the performance bond increase is coinsured and therefore shared across participants rather than fully borne by the insurer." },
+  { decisionCode: "R1", confidentialExplanation: "The forensic audit documents how the advance payment was used and supports later recovery arguments." },
+  { decisionCode: "R2", confidentialExplanation: "The blocked account secures funds that can later be enforced if a covered payment is made." },
+  { decisionCode: "R3", confidentialExplanation: "The reservation-of-rights notice preserves the insurer's position ahead of any insolvency." },
+  { decisionCode: "R4", confidentialExplanation: "Independent monitoring improves visibility over progress and completion cost, at a modest cost." },
+  { decisionCode: "R5", confidentialExplanation: "The assignment of receivables creates a further recoverable asset tied to certified amounts owed by ERAP." },
+  { decisionCode: "R6", confidentialExplanation: "A joint crisis committee improves coordination between underwriting, claims, recovery, legal and reinsurance." },
 
-  { decisionCode: "R1", variant: "all", ruleType: "Add or subtract costs", targetMetric: "costs", adjustmentValue: 1.8, confidentialExplanation: "The forensic audit creates a direct costs burden but improves evidential quality and reduces later disputes." },
-  { decisionCode: "R2", variant: "all", ruleType: "Create collateral", targetMetric: "securedProtections", adjustmentValue: 12, confidentialExplanation: "Restoring an amount to the project account improves ring-fenced support and reduces recovery leakage." },
-  { decisionCode: "R3", variant: "all", ruleType: "Preserve a recovery right", targetMetric: "potentialRecovery", adjustmentValue: 12, confidentialExplanation: "Reservation of rights preserves the insurer's legal claim position while disputes and counter-indemnities are evaluated." },
-  { decisionCode: "R4", variant: "all", ruleType: "Add or subtract costs", targetMetric: "costs", adjustmentValue: 1.1, confidentialExplanation: "Technical monitoring creates professional costs but reduces uncertainty and improves claims preparation." },
-  { decisionCode: "R5", variant: "all", ruleType: "Create collateral", targetMetric: "securedProtections", adjustmentValue: 10, confidentialExplanation: "Certified receivable assignment creates a tangible recovery asset that may later be enforced." },
-  { decisionCode: "R6", variant: "all", ruleType: "Preserve a recovery right", targetMetric: "potentialRecovery", adjustmentValue: 9, confidentialExplanation: "A crisis committee improves coordination, preserves rights and aligns all parties in the claim and recovery process." },
+  { decisionCode: "T1", confidentialExplanation: "The delay-causation report allocates responsibility for the delay and can materially affect the Performance Bond outcome under a conditional wording." },
+  { decisionCode: "T2", confidentialExplanation: "Legal advice on termination validity and bond wording clarifies the strength of the defence available under the group's variant." },
+  { decisionCode: "T3", confidentialExplanation: "Preserving financed equipment protects a tangible asset base that supports the group's position." },
+  { decisionCode: "T4", confidentialExplanation: "Early reservations of rights and counter-indemnity demands help secure the group's position before further restrictions arise." },
+  { decisionCode: "T5", confidentialExplanation: "Coordinating counsel across jurisdictions strengthens and centralises the group's legal strategy." },
+  { decisionCode: "T6", confidentialExplanation: "A single consolidated reserve report keeps reinsurers aligned on the group's reported position." },
 
-  { decisionCode: "T1", variant: "all", ruleType: "Add or subtract costs", targetMetric: "costs", adjustmentValue: 1.3, confidentialExplanation: "A delay causation report creates legal and technical expense but materially strengthens the cover and termination analysis." },
-  { decisionCode: "T2", variant: "all", ruleType: "Preserve a recovery right", targetMetric: "potentialRecovery", adjustmentValue: 7, confidentialExplanation: "Validating termination and bond wording preserves the basis for a viable claim or rights adjustment." },
-  { decisionCode: "T3", variant: "all", ruleType: "Create collateral", targetMetric: "securedProtections", adjustmentValue: 15, confidentialExplanation: "Preserving financed equipment provides a tangible asset pool and improves recovery prospects." },
-  { decisionCode: "T4", variant: "all", ruleType: "Enforce collateral", targetMetric: "realisedRecovery", adjustmentValue: 18, confidentialExplanation: "Immediate demands and rights notices can turn preserved rights into realised recovery if enforceable claims exist." },
-  { decisionCode: "T5", variant: "all", ruleType: "Preserve a recovery right", targetMetric: "potentialRecovery", adjustmentValue: 8, confidentialExplanation: "Coordinating counsel improves support for claims across Peru, Spain and Italy and strengthens recoverability." },
-  { decisionCode: "T6", variant: "all", ruleType: "Realise a previously created recovery", targetMetric: "realisedRecovery", adjustmentValue: 6, confidentialExplanation: "A unified reserve report supports faster settlement and more coherent recovery reporting." },
-
-  { decisionCode: "C1", variant: "all", ruleType: "Add or subtract AP payment", targetMetric: "apPaid", adjustmentValue: -6.5, confidentialExplanation: "The final AP bond audit reduces claim value if unsupported balances are excluded." },
-  { decisionCode: "C2", variant: "all", ruleType: "Prevention of double counting", targetMetric: "pbPaid", adjustmentValue: -10, confidentialExplanation: "Overlap review prevents double counting between the AP and PB claims and reduces overstated losses." },
-  { decisionCode: "C3", variant: "all", ruleType: "Realise a previously created recovery", targetMetric: "realisedRecovery", adjustmentValue: 20, confidentialExplanation: "The global settlement resolves the dispute and produces a cleaner, faster recovery profile." },
-  { decisionCode: "C4", variant: "all", ruleType: "Enforce collateral", targetMetric: "realisedRecovery", adjustmentValue: 22, confidentialExplanation: "Enforcing bank guarantees and assigned receivables realises value directly from secured assets." },
-  { decisionCode: "C5", variant: "all", ruleType: "Enforce collateral", targetMetric: "realisedRecovery", adjustmentValue: 16, confidentialExplanation: "Direct enforcement against counter-indemnitors converts preserved rights into actual recoveries." },
-  { decisionCode: "C6", variant: "all", ruleType: "Realise a previously created recovery", targetMetric: "realisedRecovery", adjustmentValue: 14, confidentialExplanation: "A coordinated strategy across jurisdictions improves the timing and value of recovery execution." },
+  { decisionCode: "C1", confidentialExplanation: "The final audit of the AP Bond balance reduces the claim to the amount actually supported by evidence." },
+  { decisionCode: "C2", confidentialExplanation: "The overlap review prevents the same amount being claimed twice under both bonds." },
+  { decisionCode: "C3", confidentialExplanation: "A global settlement resolves both bonds together and can reduce net payments and legal cost." },
+  { decisionCode: "C4", confidentialExplanation: "Enforcing bank guarantees and assigned receivables converts previously secured collateral into cash." },
+  { decisionCode: "C5", confidentialExplanation: "Enforcing counter-indemnity obligations directly pursues recovery from the parties who remain able to pay." },
+  { decisionCode: "C6", confidentialExplanation: "A coordinated recovery strategy across jurisdictions helps the group realise the full value of the rights it has preserved." },
 ];
-
-export function getRuleForDecision(decisionCode: string, variant: Variant) {
-  return decisionRules.filter((rule) => rule.decisionCode === decisionCode && (rule.variant === "all" || rule.variant === variant));
-}
 
 export function getDecisionTextByCode(code: string) {
   return decisionRules.find((rule) => rule.decisionCode === code)?.confidentialExplanation || "Confidential adjustment applied.";
