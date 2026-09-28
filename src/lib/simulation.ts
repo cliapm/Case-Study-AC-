@@ -38,12 +38,20 @@ const FINAL_STAGE_NUMBER = 4;
  * settlement split between AP/PB, and which enforcement code "unlocks" which
  * created collateral) reflect a best-faith reading — see the inline notes.
  */
+// The Advance Payment Bond's full, unreduced face value (20% of the USD 600m contract).
+// Stage 1's own "position returned" instruction says "AP and PB exposure maintained" —
+// i.e. still the full bond amount. The amortised-down balance (baseline.apExposure/
+// apPaidBase, USD 30m) is a fact the story only reveals from Stage 2 onward (USD 90m of
+// the original 120m advance is amortised, leaving the 30m balance ERAP later claims).
+const AP_BOND_FACE_VALUE = 120;
+
 export function calculateTeamPosition(teamId: string, stageNumber: number, selectedCodes: string[], language: Language = "en"): TeamPosition {
   const team = getTeamById(teamId);
   const variant = team.variant;
   const baseline = variantBaselines[variant];
   const text = simulationText[language];
   const has = (code: string) => selectedCodes.includes(code);
+  const isStageOne = stageNumber <= 1;
 
   // --- Costs ---
   let costs = baseline.costsBase;
@@ -71,7 +79,7 @@ export function calculateTeamPosition(teamId: string, stageNumber: number, selec
   if (has("U6")) premium *= 1.1;
 
   // --- Advance Payment Bond paid ---
-  let apPaid = baseline.apPaidBase;
+  let apPaid = isStageOne ? AP_BOND_FACE_VALUE : baseline.apPaidBase;
   if (has("C1")) apPaid -= 4;
   if (c2) apPaid -= 4;
   if (has("T3") && !c2) apPaid -= 2; // T3's AP reduction only applies if C2 didn't already produce a larger one
@@ -129,7 +137,7 @@ export function calculateTeamPosition(teamId: string, stageNumber: number, selec
   return {
     teamId,
     stageNumber,
-    apExposure: Number(baseline.apExposure.toFixed(3)),
+    apExposure: Number((isStageOne ? AP_BOND_FACE_VALUE : baseline.apExposure).toFixed(3)),
     pbExposure: Number(baseline.pbExposure.toFixed(3)),
     accumulatedPremium: Number(premium.toFixed(3)),
     apPaid: Number(apPaid.toFixed(3)),
