@@ -1,5 +1,5 @@
 export const es = {
-  nav: { participant: "Participante", facilitator: "Facilitador" },
+  nav: { participant: "Participante", facilitator: "Facilitador", qr: "QR" },
   brand: { tag: "Proyecto Agua Clara", subtitle: "Simulación" },
   common: { team: "Equipo", variant: "Variante", selected: "Seleccionada", unselected: "No seleccionada", stage: "Etapa", back: "Volver" },
   simulation: {
@@ -95,6 +95,11 @@ export const es = {
   },
   facilitatorLoading: {
     label: "Estado de la simulación", title: "Cargando panel del facilitador",
+  },
+  facilitatorQr: {
+    label: "Acceso QR", title: "Código QR del sitio web",
+    subtitle: "Lleva directamente a la página de inicio de Proyecto Agua Clara — se puede imprimir y colocar donde sea.",
+    downloadButton: "Descargar imagen QR",
   },
   participantLogin: {
     title: "Simulación Integrada de Suscripción, Reclamos y Recuperación", confidential: "Confidencial",

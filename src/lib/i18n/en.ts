@@ -1,5 +1,5 @@
 export const en = {
-  nav: { participant: "Participant", facilitator: "Facilitator" },
+  nav: { participant: "Participant", facilitator: "Facilitator", qr: "QR" },
   brand: { tag: "Project Agua Clara", subtitle: "Simulation" },
   common: { team: "Team", variant: "Variant", selected: "Selected", unselected: "Unselected", stage: "Stage", back: "Back" },
   simulation: {
@@ -95,6 +95,11 @@ export const en = {
   },
   facilitatorLoading: {
     label: "Simulation status", title: "Loading facilitator dashboard",
+  },
+  facilitatorQr: {
+    label: "QR access", title: "Website QR code",
+    subtitle: "Scans straight to the Project Agua Clara home page — safe to print and post anywhere.",
+    downloadButton: "Download QR image",
   },
   participantLogin: {
     title: "Integrated Underwriting, Claims and Recovery Simulation", confidential: "Confidential",
