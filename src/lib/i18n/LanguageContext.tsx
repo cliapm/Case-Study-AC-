@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { en } from "./en";
 import { es } from "./es";
 import { pt } from "./pt";
@@ -30,16 +30,8 @@ const LanguageContext = createContext<LanguageContextValue>(defaultValue);
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>("es");
 
-  useEffect(() => {
-    const stored = window.localStorage.getItem("agua-clara-language") as Language | null;
-    if (stored && dictionaries[stored]) {
-      setLanguageState(stored);
-    }
-  }, []);
-
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    window.localStorage.setItem("agua-clara-language", lang);
   };
 
   const t = (path: string) => getValueAtPath(dictionaries[language], path);
