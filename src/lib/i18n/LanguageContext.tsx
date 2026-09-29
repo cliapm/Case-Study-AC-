@@ -20,15 +20,15 @@ function getValueAtPath(obj: any, path: string): string {
 }
 
 const defaultValue: LanguageContextValue = {
-  language: "en",
+  language: "es",
   setLanguage: () => {},
-  t: (path: string) => getValueAtPath(en, path),
+  t: (path: string) => getValueAtPath(es, path),
 };
 
 const LanguageContext = createContext<LanguageContextValue>(defaultValue);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("en");
+  const [language, setLanguageState] = useState<Language>("es");
 
   useEffect(() => {
     const stored = window.localStorage.getItem("agua-clara-language") as Language | null;

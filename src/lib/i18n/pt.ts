@@ -32,7 +32,7 @@ export const pt = {
     accessNotice: "Selecione sua equipe para entrar na simulação.", enterButton: "Entrar na simulação", facilitatorAccess: "Acesso do facilitador",
     caseStatus: "Status do caso", currentRelease: "Liberação atual",
     releaseDescription: "Cada etapa liberada traz monitoramento ao vivo e gestão de bloqueio de decisões para os facilitadores, e um novo conjunto de decisões para as equipes participantes.",
-    statTeams: "30 grupos em 3 variantes", statVariants: "3 variantes: A, B e C",
+    statTeams: "Os grupos são divididos em 3 variantes", statVariants: "3 variantes: A, B e C",
     statStages: "4 etapas sequenciais", statDecisions: "3 decisões por etapa",
   },
   currentStage: {
