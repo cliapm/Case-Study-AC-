@@ -19,9 +19,9 @@ const enRuleExplanations: Record<string, string> = Object.fromEntries(
 const esDecisions: Record<string, DecisionText> = {
   U1: { title: "Cuenta dedicada del proyecto", text: "Establecer una cuenta dedicada del proyecto con autorización dual.", immediateEffectText: "El pago anticipado solo podrá utilizarse a través de la cuenta controlada." },
   U2: { title: "Exigencia de informes trimestrales", text: "Exigir informes trimestrales documentados sobre el uso del pago anticipado.", immediateEffectText: "El consorcio entrega estados de cuenta, facturas y conciliaciones trimestrales." },
-  U3: { title: "Reducciones condicionales de la garantía", text: "Condicionar cada reducción de la Garantía de Pago Anticipado a evidencia de amortización y confirmación escrita de ERAP.", immediateEffectText: "No se reconoce ninguna reducción basada únicamente en el avance declarado por el consorcio." },
+  U3: { title: "Reducciones condicionales de la garantía", text: "Condicionar cada reducción de la Fianza de Anticipo a evidencia de amortización y confirmación escrita de ERAP.", immediateEffectText: "No se reconoce ninguna reducción basada únicamente en el avance declarado por el consorcio." },
   U4: { title: "Revisión técnica independiente", text: "Encargar una revisión técnica independiente del presupuesto y el cronograma.", immediateEffectText: "Un asesor independiente valida el presupuesto, la contingencia, las adquisiciones y la ruta crítica." },
-  U5: { title: "Garantía bancaria irrevocable", text: "Exigir una garantía bancaria irrevocable de USD 15,000,000 vinculada a la Garantía de Pago Anticipado.", immediateEffectText: "USD 15,000,000 quedan respaldados por una garantía bancaria." },
+  U5: { title: "Garantía bancaria irrevocable", text: "Exigir una garantía bancaria irrevocable de USD 15,000,000 vinculada a la Fianza de Anticipo.", immediateEffectText: "USD 15,000,000 quedan respaldados por una garantía bancaria." },
   U6: { title: "Prima inicial adicional", text: "Cobrar una prima inicial adicional del 10%.", immediateEffectText: "La prima inicial aumenta un 10%, de USD 6,960,000 a USD 7,656,000." },
 
   R1: { title: "Auditoría forense", text: "Encargar una auditoría forense de los USD 30,000,000 con documentación incompleta.", immediateEffectText: "Se investiga y documenta el destino de los fondos." },
@@ -38,8 +38,8 @@ const esDecisions: Record<string, DecisionText> = {
   T5: { title: "Asesoría legal coordinadora", text: "Designar asesoría legal coordinadora en Perú, España e Italia.", immediateEffectText: "La estrategia legal se centraliza." },
   T6: { title: "Informe de reserva consolidado", text: "Notificar a las reaseguradoras mediante un único informe de reserva consolidado.", immediateEffectText: "Todos los mercados reciben la misma información y base de cálculo." },
 
-  C1: { title: "Auditoría final de la garantía de pago anticipado", text: "Realizar una auditoría final del saldo de la Garantía de Pago Anticipado.", immediateEffectText: "El monto adeudado se concilia con la amortización y los equipos reutilizables." },
-  C2: { title: "Revisión de superposición", text: "Realizar una revisión de superposición entre la Garantía de Pago Anticipado y la Garantía de Cumplimiento.", immediateEffectText: "Los montos duplicados se eliminan antes del pago." },
+  C1: { title: "Auditoría final de la fianza de anticipo", text: "Realizar una auditoría final del saldo de la Fianza de Anticipo.", immediateEffectText: "El monto adeudado se concilia con la amortización y los equipos reutilizables." },
+  C2: { title: "Revisión de superposición", text: "Realizar una revisión de superposición entre la Fianza de Anticipo y la Fianza de Cumplimiento.", immediateEffectText: "Los montos duplicados se eliminan antes del pago." },
   C3: { title: "Acuerdo global", text: "Negociar un acuerdo global con ERAP, que incluya la liberación y cesión de derechos.", immediateEffectText: "Ambos reclamos se resuelven mediante un único acuerdo global." },
   C4: { title: "Ejecución de la garantía bancaria", text: "Ejecutar las garantías bancarias y las cuentas por cobrar cedidas.", immediateEffectText: "El colateral previamente obtenido se convierte en efectivo." },
   C5: { title: "Ejecución de la contraindemnización", text: "Ejecutar las obligaciones directas frente a los contraindemnizantes disponibles.", immediateEffectText: "La recuperación se inicia contra todos los obligados accesibles." },
@@ -80,7 +80,7 @@ const esStages: Record<number, StageText> = {
   1: { title: "Suscripción inicial", caseDevelopment: "Los términos generales del contrato ya se conocen. Se constituyen el pago anticipado y la cuenta del proyecto, y los equipos pueden seleccionar tres protecciones adicionales para aumentar su nivel de confianza en la suscripción." },
   2: { title: "Señales de alerta y deterioro del proyecto", caseDevelopment: "Mes 31: el avance físico alcanza el 50% frente a un 63% esperado, el avance financiero se adelanta al 67%, y la documentación de parte del saldo remanente del pago anticipado está incompleta." },
   3: { title: "Terminación y preparación previa al reclamo", caseDevelopment: "Mes 43: ERAP termina el contrato. Iberagua solicita protección judicial frente a sus acreedores y el equipo prepara reservas, documentación, defensa y recuperación antes de que se presenten los reclamos formales." },
-  4: { title: "Reclamo y recuperación", caseDevelopment: "ERAP presenta reclamos formales bajo la Garantía de Pago Anticipado y la Garantía de Cumplimiento. El equipo finaliza su posición sobre límites, prima, protecciones, reservas y derechos preservados." },
+  4: { title: "Reclamo y recuperación", caseDevelopment: "ERAP presenta reclamos formales bajo la Fianza de Anticipo y la Fianza de Cumplimiento. El equipo finaliza su posición sobre límites, prima, protecciones, reservas y derechos preservados." },
 };
 
 const ptStages: Record<number, StageText> = {
@@ -91,9 +91,9 @@ const ptStages: Record<number, StageText> = {
 };
 
 const esVariants: Record<Variant, string> = {
-  A: "Garantía de Pago Anticipado documentaria condicional / Garantía de Cumplimiento condicional / contraindemnizaciones solidarias e ilimitadas de los tres miembros del consorcio",
-  B: "Garantía de Pago Anticipado a primera demanda / Garantía de Cumplimiento a primera demanda / contraindemnizaciones solidarias e ilimitadas de los tres miembros del consorcio",
-  C: "Garantía de Pago Anticipado a primera demanda / Garantía de Cumplimiento a primera demanda / contraindemnización otorgada únicamente por Iberagua",
+  A: "Fianza de Anticipo documentaria condicional / Fianza de Cumplimiento condicional / contraindemnizaciones solidarias e ilimitadas de los tres miembros del consorcio",
+  B: "Fianza de Anticipo a primera demanda / Fianza de Cumplimiento a primera demanda / contraindemnizaciones solidarias e ilimitadas de los tres miembros del consorcio",
+  C: "Fianza de Anticipo a primera demanda / Fianza de Cumplimiento a primera demanda / contraindemnización otorgada únicamente por Iberagua",
 };
 
 const ptVariants: Record<Variant, string> = {
@@ -115,15 +115,15 @@ const esRuleExplanations: Record<string, string> = {
   R4: "El monitoreo independiente mejora la visibilidad sobre el avance y el costo de finalización, con un costo moderado.",
   R5: "La cesión de cuentas por cobrar crea un activo recuperable adicional vinculado a los montos certificados que adeuda ERAP.",
   R6: "Un comité de crisis conjunto mejora la coordinación entre suscripción, reclamos, recuperación, legal y reaseguro.",
-  T1: "El informe de causalidad de retrasos asigna responsabilidad por el retraso y puede afectar de forma significativa el resultado de la Garantía de Cumplimiento bajo una redacción condicional.",
+  T1: "El informe de causalidad de retrasos asigna responsabilidad por el retraso y puede afectar de forma significativa el resultado de la Fianza de Cumplimiento bajo una redacción condicional.",
   T2: "La asesoría legal sobre la validez de la terminación y la redacción de la garantía aclara la solidez de la defensa disponible según la variante del equipo.",
   T3: "Preservar los equipos financiados protege una base de activos tangibles que respalda la posición del equipo.",
   T4: "Las reservas de derechos y demandas tempranas de contraindemnización ayudan a asegurar la posición del equipo antes de que surjan nuevas restricciones.",
   T5: "Coordinar la asesoría legal entre jurisdicciones fortalece y centraliza la estrategia legal del equipo.",
   T6: "Un único informe de reserva consolidado mantiene alineadas a las reaseguradoras sobre la posición reportada por el equipo.",
-  C1: "La auditoría final del saldo de la Garantía de Pago Anticipado reduce el reclamo al monto efectivamente respaldado por evidencia.",
-  C2: "La revisión de superposición evita que el mismo monto se reclame dos veces bajo ambas garantías.",
-  C3: "Un acuerdo global resuelve ambas garantías de forma conjunta y puede reducir los pagos netos y el costo legal.",
+  C1: "La auditoría final del saldo de la Fianza de Anticipo reduce el reclamo al monto efectivamente respaldado por evidencia.",
+  C2: "La revisión de superposición evita que el mismo monto se reclame dos veces bajo ambas fianzas.",
+  C3: "Un acuerdo global resuelve ambas fianzas de forma conjunta y puede reducir los pagos netos y el costo legal.",
   C4: "Ejecutar las garantías bancarias y las cuentas por cobrar cedidas convierte el colateral previamente asegurado en efectivo.",
   C5: "Ejecutar las obligaciones de contraindemnización persigue directamente la recuperación de las partes que aún pueden pagar.",
   C6: "Una estrategia de recuperación coordinada entre jurisdicciones ayuda al equipo a materializar todo el valor de los derechos preservados.",

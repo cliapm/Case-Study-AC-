@@ -37,6 +37,8 @@ function CaseOverviewContent() {
               <li><strong className="text-slate-900">{t("caseOverview.contractValue")}:</strong> {t("caseOverview.contractValueAmount")}</li>
               <li><strong className="text-slate-900">{t("caseOverview.originalTerm")}:</strong> {t("caseOverview.originalTermValue")}</li>
               <li><strong className="text-slate-900">{t("caseOverview.assistedOperation")}:</strong> {t("caseOverview.assistedOperationValue")}</li>
+              <li><strong className="text-slate-900">{t("caseOverview.grossMargin")}:</strong> {t("caseOverview.grossMarginValue")}</li>
+              <li><strong className="text-slate-900">{t("caseOverview.contingency")}:</strong> {t("caseOverview.contingencyValue")}</li>
               <li><strong className="text-slate-900">{t("caseOverview.delayDamages")}:</strong> {t("caseOverview.delayDamagesValue")}</li>
               <li><strong className="text-slate-900">{t("caseOverview.apBond")}:</strong> {t("caseOverview.apBondAmount")}</li>
               <li><strong className="text-slate-900">{t("caseOverview.pbBond")}:</strong> {t("caseOverview.pbBondAmount")}</li>
