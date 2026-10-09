@@ -6,6 +6,7 @@ import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 export const metadata: Metadata = {
   title: "Project Agua Clara",
   description: "Integrated underwriting, claims and recovery simulation",
+  robots: { index: false, follow: false, nocache: true },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
